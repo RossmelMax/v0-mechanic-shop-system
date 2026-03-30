@@ -1,0 +1,297 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// CLIENTES
+// ============================================
+model Client {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  email     String?
+  phone     String?
+  address   String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  vehicles  Vehicle[]
+  quotations Quotation[]
+  orders    WorkOrder[]
+  sales     Sale[]
+
+  @@index([name])
+}
+
+// ============================================
+// VEHÍCULOS
+// ============================================
+model Vehicle {
+  id             String     @id @default(cuid())
+  clientId       String
+  make           String     // Marca (Toyota, Ford, etc)
+  model          String     // Modelo
+  year           Int
+  licensePlate   String     @unique
+  vin            String?    // Número de serie
+  type           String     // Tipo (auto, camión, moto, etc)
+  fuelType       String?    // Tipo de combustible
+  transmission   String?    // Tipo de transmisión
+  mileage        Int?       // Kilometraje
+  color          String?
+  engineType     String?    // Con/sin computadora (WITH_COMPUTER / NO_COMPUTER)
+  notes          String?    @db.Text
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  client         Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  quotations     Quotation[]
+  orders         WorkOrder[]
+  diagnostics    Diagnostic[]
+
+  @@index([clientId])
+  @@index([licensePlate])
+}
+
+// ============================================
+// COTIZACIONES
+// ============================================
+model Quotation {
+  id             String     @id @default(cuid())
+  quotationNumber String    @unique
+  clientId       String
+  vehicleId      String
+  status         String     @default("PENDING") // PENDING, IN_DIAGNOSIS, QUOTED, ACCEPTED, REJECTED, CONVERTED_TO_ORDER
+  estimatedTotal Float?
+  diagnosisDate  DateTime?
+  diagnosisMechanicNotes String? @db.Text
+  externalDiagnosisCode  String? // Para autos con computadora
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  quotationDate  DateTime   @default(now())
+  
+  client         Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  vehicle        Vehicle    @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  diagnostics    Diagnostic[]
+  quotationItems QuotationItem[]
+  workOrder      WorkOrder?
+
+  @@index([clientId])
+  @@index([vehicleId])
+  @@index([status])
+  @@index([quotationNumber])
+}
+
+// ============================================
+// DIAGNÓSTICO (Vinculado a Cotizaciones)
+// ============================================
+model Diagnostic {
+  id             String     @id @default(cuid())
+  quotationId    String
+  vehicleId      String
+  faultType      String     // COMPUTER_ERROR / MANUAL_INSPECTION
+  faultCodes     String?    @db.Text // JSON array de códigos DTC si es con computadora
+  relatedFaultId String?    // Referencia a un fault de la DB de fallas
+  symptoms       String     @db.Text // Descripción de síntomas
+  affectedSystems String?    @db.Text // JSON array de sistemas afectados
+  severity       String     @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  detailedAnalysis String?   @db.Text
+  recommendedFix String?     @db.Text
+  relatedFaults  String?     @db.Text // JSON array de fault IDs relacionadas
+  imagesUrls     String?     @db.Text // JSON array de URLs
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  
+  quotation      Quotation  @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  vehicle        Vehicle    @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([quotationId])
+  @@index([vehicleId])
+  @@index([faultType])
+  @@index([severity])
+}
+
+// ============================================
+// BASE DE FALLAS (Jurisprudencia de Fallas)
+// ============================================
+model FaultDatabase {
+  id             String     @id @default(cuid())
+  title          String
+  code           String?    @unique // Para autos con computadora
+  description    String     @db.Text
+  symptoms       String     @db.Text // Síntomas principales
+  keywords       String     @db.Text // JSON array de palabras clave para búsqueda
+  affectedSystems String?    @db.Text // JSON array [engine, electrical, transmission, etc]
+  vehicleTypes   String?     @db.Text // JSON array [auto, truck, moto, etc]
+  vehicleMakes   String?     @db.Text // JSON array [Toyota, Ford, etc] - si aplica a marcas específicas
+  commonCauses   String     @db.Text // JSON array
+  solutionProcess String    @db.Text // Paso a paso de solución
+  estimatedTime  Int?       // En minutos
+  estimatedCost  Float?     // Costo estimado
+  requiredParts  String?    @db.Text // JSON array de partes requeridas
+  tools           String?    @db.Text // JSON array de herramientas
+  relatedFaults  String?    @db.Text // JSON array de fault IDs relacionadas
+  imagesUrls     String?    @db.Text // JSON array de URLs de imágenes
+  videoUrl       String?
+  relatedDocLink String?    // Link a documentación externa
+  isCommon       Boolean    @default(false)
+  severity       String     @default("MEDIUM")
+  computerRequired Boolean  @default(false) // Si requiere diagnóstico con computadora
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@index([title])
+  @@index([code])
+  @@index([affectedSystems])
+  @@fulltext([title, description, symptoms, keywords])
+}
+
+// ============================================
+// ÓRDENES DE TRABAJO
+// ============================================
+model WorkOrder {
+  id             String     @id @default(cuid())
+  workOrderNumber String    @unique
+  quotationId    String     @unique
+  clientId       String
+  vehicleId      String
+  status         String     @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, DELIVERED
+  startDate      DateTime?
+  completionDate DateTime?
+  mechanic       String?
+  notes          String?    @db.Text
+  totalCost      Float?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  quotation      Quotation  @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  client         Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  vehicle        Vehicle    @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  orderItems     OrderItem[]
+  sale           Sale?
+
+  @@index([clientId])
+  @@index([vehicleId])
+  @@index([status])
+  @@index([quotationId])
+}
+
+// ============================================
+// PRODUCTOS / INVENTARIO
+// ============================================
+model Product {
+  id             String     @id @default(cuid())
+  code           String     @unique
+  name           String
+  description    String?    @db.Text
+  category       String
+  price          Float
+  cost           Float?
+  quantity       Int        @default(0)
+  unit           String     @default("unit") // unit, liter, meter, etc
+  supplier       String?
+  minStock       Int        @default(5)
+  maxStock       Int        @default(100)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  
+  orderItems     OrderItem[]
+  quotationItems QuotationItem[]
+  stockMovements StockMovement[]
+
+  @@index([code])
+  @@index([name])
+  @@index([category])
+}
+
+// ============================================
+// ITEMS DE ÓRDENES DE TRABAJO
+// ============================================
+model OrderItem {
+  id             String     @id @default(cuid())
+  workOrderId    String
+  productId      String
+  quantity       Int
+  unitPrice      Float
+  subtotal       Float      // quantity * unitPrice
+  createdAt      DateTime   @default(now())
+
+  workOrder      WorkOrder  @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  product        Product    @relation(fields: [productId], references: [id])
+
+  @@index([workOrderId])
+  @@index([productId])
+}
+
+// ============================================
+// ITEMS DE COTIZACIONES
+// ============================================
+model QuotationItem {
+  id             String     @id @default(cuid())
+  quotationId    String
+  productId      String
+  quantity       Int
+  unitPrice      Float
+  subtotal       Float      // quantity * unitPrice
+  createdAt      DateTime   @default(now())
+
+  quotation      Quotation  @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  product        Product    @relation(fields: [productId], references: [id])
+
+  @@index([quotationId])
+  @@index([productId])
+}
+
+// ============================================
+// MOVIMIENTOS DE INVENTARIO
+// ============================================
+model StockMovement {
+  id             String     @id @default(cuid())
+  productId      String
+  type           String     // ENTRY, EXIT, ADJUSTMENT
+  quantity       Int
+  reason         String     // PURCHASE, SALE, DAMAGE, ADJUSTMENT
+  relatedId      String?    // ID de orden o cotización relacionada
+  notes          String?    @db.Text
+  createdAt      DateTime   @default(now())
+
+  product        Product    @relation(fields: [productId], references: [id])
+
+  @@index([productId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+// ============================================
+// VENTAS / FACTURACIÓN
+// ============================================
+model Sale {
+  id             String     @id @default(cuid())
+  saleNumber     String     @unique
+  workOrderId    String     @unique
+  clientId       String
+  subtotal       Float
+  tax            Float      @default(0)
+  discount       Float      @default(0)
+  total          Float
+  paymentMethod  String     // CASH, CARD, CHECK, TRANSFER
+  paymentStatus  String     @default("PENDING") // PENDING, PAID, PARTIAL
+  invoiceNumber  String?    @unique
+  saleDate       DateTime   @default(now())
+  notes          String?    @db.Text
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  workOrder      WorkOrder  @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  client         Client     @relation(fields: [clientId], references: [id])
+
+  @@index([clientId])
+  @@index([workOrderId])
+  @@index([saleDate])
+  @@index([paymentStatus])
+}
