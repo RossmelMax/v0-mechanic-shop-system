@@ -79,11 +79,11 @@ export default function SalesPage() {
 
   // Filtrar ventas
   const filteredSales = sales.filter(sale => {
-    const saleNumber = sale.saleNumber || sale.number || ""
+    const saleNumber = (sale.saleNumber || "").toString()
     const matchesSearch = saleNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      sale.client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      sale.workOrder.vehicle.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      sale.workOrder.vehicle.model.toLowerCase().includes(searchTerm.toLowerCase())
+      (sale.client?.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (sale.workOrder?.vehicle?.make || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (sale.workOrder?.vehicle?.model || "").toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = statusFilter === 'all' || sale.paymentStatus === statusFilter
     return matchesSearch && matchesStatus
   })
@@ -212,8 +212,8 @@ export default function SalesPage() {
             <TableBody>
               {filteredSales.map((sale) => (
                 <TableRow key={sale.id}>
-                  <TableCell className="font-medium">{sale.saleNumber || sale.number}</TableCell>
-                  <TableCell>{sale.client.name}</TableCell>
+                  <TableCell className="font-medium">{sale.saleNumber}</TableCell>
+                  <TableCell>{sale.client?.name || '-'}</TableCell>
                   <TableCell>
                     {sale.workOrder.vehicle.make} {sale.workOrder.vehicle.model} ({sale.workOrder.vehicle.year})
                   </TableCell>
@@ -254,7 +254,7 @@ export default function SalesPage() {
                             <AlertDialogTitle>¿Eliminar venta?</AlertDialogTitle>
                             <AlertDialogDescription>
                               Esta acción no se puede deshacer. Se eliminará permanentemente
-                              la venta {sale.number}.
+                            la venta {sale.saleNumber}.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>

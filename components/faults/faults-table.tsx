@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useFaults, useFaultSearch } from '@/hooks/use-faults'
-import { Zap, AlertTriangle, Tool, Search } from 'lucide-react'
+import { Zap, AlertTriangle, Wrench, Search } from 'lucide-react'
 
 export function FaultsTable() {
   const [page, setPage] = useState(1)

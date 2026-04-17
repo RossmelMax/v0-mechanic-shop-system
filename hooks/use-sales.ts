@@ -4,7 +4,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export interface Sale {
   id: string;
-  number: string;
+  saleNumber: string;
   workOrderId: string;
   clientId: string;
   total: number;
@@ -18,7 +18,7 @@ export interface Sale {
   updatedAt: string;
   workOrder: {
     id: string;
-    number: string;
+    workOrderNumber: string;
     client: {
       id: string;
       name: string;
