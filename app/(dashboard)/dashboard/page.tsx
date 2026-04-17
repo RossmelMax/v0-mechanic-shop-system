@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
 import {
     Users,
     Car,
@@ -16,38 +17,39 @@ import {
     Plus
 } from 'lucide-react'
 import Link from 'next/link'
+import { useClients } from '@/hooks/use-clients'
+import { useWorkOrders } from '@/hooks/use-orders'
+import { useSales } from '@/hooks/use-sales'
+import { useProducts } from '@/hooks/use-products'
 
 export default function DashboardPage() {
-    // Mock data - in a real app, this would come from your API
+    const { clients, isLoading: clientsLoading } = useClients()
+    const { workOrders, isLoading: ordersLoading } = useWorkOrders()
+    const { sales, isLoading: salesLoading } = useSales()
+    const { products, isLoading: productsLoading } = useProducts()
+
+    const isLoading = clientsLoading || ordersLoading || salesLoading || productsLoading
+
+    // Calculate stats from real data
     const stats = {
-        totalClients: 8,
-        totalVehicles: 11,
-        totalOrders: 2,
-        totalSales: 1,
-        pendingOrders: 1,
-        completedOrders: 1,
-        totalRevenue: 1250.00,
-        lowStockItems: 3
+        totalClients: clients.length,
+        totalVehicles: clients.reduce((sum, client) => sum + (client.vehicles?.length || 0), 0),
+        totalOrders: workOrders.length,
+        totalSales: sales.length,
+        pendingOrders: workOrders.filter(o => o.status === 'pending').length,
+        completedOrders: workOrders.filter(o => o.status === 'completed').length,
+        totalRevenue: sales.reduce((sum, sale) => sum + sale.total, 0),
+        lowStockItems: products.filter(p => p.quantity <= p.minStock).length
     }
 
-    const recentOrders = [
-        {
-            id: '1',
-            number: 'ORD-2024-001',
-            client: 'María González',
-            vehicle: 'Toyota Corolla',
-            status: 'completed',
-            total: 450.00
-        },
-        {
-            id: '2',
-            number: 'ORD-2024-002',
-            client: 'Carlos Rodríguez',
-            vehicle: 'Ford Ranger',
-            status: 'in_progress',
-            total: 800.00
-        }
-    ]
+    const recentOrders = workOrders.slice(0, 2).map(order => ({
+        id: order.id,
+        number: order.workOrderNumber,
+        client: order.client.name,
+        vehicle: `${order.vehicle.make} ${order.vehicle.model}`,
+        status: order.status,
+        total: 0
+    }))
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -73,6 +75,14 @@ export default function DashboardPage() {
             default:
                 return status
         }
+    }
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-96">
+                <Spinner />
+            </div>
+        )
     }
 
     return (
@@ -217,7 +227,7 @@ export default function DashboardPage() {
                                         <p className="font-medium text-yellow-800">Productos con stock bajo</p>
                                         <p className="text-sm text-yellow-700">{stats.lowStockItems} productos requieren reposición</p>
                                     </div>
-                                    <Link href="/inventory">
+                                    <Link href="/products">
                                         <Button variant="outline" size="sm">
                                             Gestionar
                                         </Button>
