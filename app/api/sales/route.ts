@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (workOrder.status !== "COMPLETED") {
+    if (workOrder.status !== "completed") {
       return NextResponse.json(
         {
           error:
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
         discount: data.discount || 0,
         total: data.total,
         paymentMethod: data.paymentMethod,
-        paymentStatus: data.paymentStatus || "PENDING",
+        paymentStatus: data.paymentStatus || "pending",
         invoiceNumber: data.invoiceNumber || null,
         saleDate: data.saleDate ? new Date(data.saleDate) : new Date(),
         notes: data.notes || null,

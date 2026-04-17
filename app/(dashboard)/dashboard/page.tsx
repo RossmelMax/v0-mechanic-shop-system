@@ -67,7 +67,7 @@ export default function DashboardPage() {
     const getStatusLabel = (status: string) => {
         switch (status) {
             case 'completed':
-                return 'Completada'
+                return 'COMPLETED'
             case 'in_progress':
                 return 'En Progreso'
             case 'pending':

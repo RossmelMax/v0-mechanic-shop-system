@@ -17,7 +17,7 @@ const statusColors = {
 const statusLabels = {
     pending: 'Pendiente',
     in_progress: 'En Progreso',
-    completed: 'Completada',
+    completed: 'COMPLETED',
     cancelled: 'Cancelada',
 }
 
@@ -117,114 +117,114 @@ export function WorkOrderDetailsDialog({
 
                     {/* Información del cliente */}
                     {workOrder.client && (
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center space-x-2">
-                                <User className="h-5 w-5" />
-                                <span>Información del Cliente</span>
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <p className="text-sm font-medium">Nombre</p>
-                                    <p className="text-sm text-gray-600">{workOrder.client?.name || '-'}</p>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center space-x-2">
+                                    <User className="h-5 w-5" />
+                                    <span>Información del Cliente</span>
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p className="text-sm font-medium">Nombre</p>
+                                        <p className="text-sm text-gray-600">{workOrder.client?.name || '-'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium">Email</p>
+                                        <p className="text-sm text-gray-600">{workOrder.client?.email || 'No especificado'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium">Teléfono</p>
+                                        <p className="text-sm text-gray-600">{workOrder.client?.phone || 'No especificado'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium">Cliente desde</p>
+                                        <p className="text-sm text-gray-600">
+                                            {workOrder.client?.createdAt ? new Date(workOrder.client.createdAt).toLocaleDateString() : '-'}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="text-sm font-medium">Email</p>
-                                    <p className="text-sm text-gray-600">{workOrder.client?.email || 'No especificado'}</p>
-                                </div>
-                                <div>
-                                    <p className="text-sm font-medium">Teléfono</p>
-                                    <p className="text-sm text-gray-600">{workOrder.client?.phone || 'No especificado'}</p>
-                                </div>
-                                <div>
-                                    <p className="text-sm font-medium">Cliente desde</p>
-                                    <p className="text-sm text-gray-600">
-                                        {workOrder.client?.createdAt ? new Date(workOrder.client.createdAt).toLocaleDateString() : '-'}
-                                    </p>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                            </CardContent>
+                        </Card>
                     )}
 
                     {/* Información del vehículo */}
                     {workOrder.vehicle && (
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center space-x-2">
-                                <Car className="h-5 w-5" />
-                                <span>Información del Vehículo</span>
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <p className="text-sm font-medium">Marca y Modelo</p>
-                                    <p className="text-sm text-gray-600">
-                                        {workOrder.vehicle?.make || ''} {workOrder.vehicle?.model || ''}
-                                    </p>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center space-x-2">
+                                    <Car className="h-5 w-5" />
+                                    <span>Información del Vehículo</span>
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p className="text-sm font-medium">Marca y Modelo</p>
+                                        <p className="text-sm text-gray-600">
+                                            {workOrder.vehicle?.make || ''} {workOrder.vehicle?.model || ''}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium">Año</p>
+                                        <p className="text-sm text-gray-600">{workOrder.vehicle?.year || '-'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium">Placa</p>
+                                        <p className="text-sm text-gray-600">{workOrder.vehicle?.licensePlate || '-'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium">Color</p>
+                                        <p className="text-sm text-gray-600">{workOrder.vehicle?.color || 'No especificado'}</p>
+                                    </div>
+                                    <div className="col-span-2">
+                                        <p className="text-sm font-medium">VIN</p>
+                                        <p className="text-sm text-gray-600">{workOrder.vehicle?.vin || 'No especificado'}</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="text-sm font-medium">Año</p>
-                                    <p className="text-sm text-gray-600">{workOrder.vehicle?.year || '-'}</p>
-                                </div>
-                                <div>
-                                    <p className="text-sm font-medium">Placa</p>
-                                    <p className="text-sm text-gray-600">{workOrder.vehicle?.licensePlate || '-'}</p>
-                                </div>
-                                <div>
-                                    <p className="text-sm font-medium">Color</p>
-                                    <p className="text-sm text-gray-600">{workOrder.vehicle?.color || 'No especificado'}</p>
-                                </div>
-                                <div className="col-span-2">
-                                    <p className="text-sm font-medium">VIN</p>
-                                    <p className="text-sm text-gray-600">{workOrder.vehicle?.vin || 'No especificado'}</p>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                            </CardContent>
+                        </Card>
                     )}
 
                     {/* Información de la cotización */}
                     {workOrder.quotation && (
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center space-x-2">
-                                <FileText className="h-5 w-5" />
-                                <span>Información de la Cotización</span>
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <p className="text-sm font-medium">Número de Cotización</p>
-                                    <p className="text-sm text-gray-600">#{workOrder.quotation?.quotationNumber || '-'}</p>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center space-x-2">
+                                    <FileText className="h-5 w-5" />
+                                    <span>Información de la Cotización</span>
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p className="text-sm font-medium">Número de Cotización</p>
+                                        <p className="text-sm text-gray-600">#{workOrder.quotation?.quotationNumber || '-'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium">Estado de Cotización</p>
+                                        <Badge variant="outline">
+                                            {workOrder.quotation?.status === 'ACCEPTED' ? 'Aceptada' :
+                                                workOrder.quotation?.status === 'PENDING' ? 'Pendiente' :
+                                                    workOrder.quotation?.status === 'REJECTED' ? 'Rechazada' : workOrder.quotation?.status}
+                                        </Badge>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium">Fecha de Cotización</p>
+                                        <p className="text-sm text-gray-600">
+                                            {workOrder.quotation?.createdAt ? new Date(workOrder.quotation.createdAt).toLocaleDateString() : '-'}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium">Total de Cotización</p>
+                                        <p className="text-sm text-gray-600">
+                                            ${workOrder.quotation?.estimatedTotal?.toLocaleString() || '0'}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="text-sm font-medium">Estado de Cotización</p>
-                                    <Badge variant="outline">
-                                        {workOrder.quotation?.status === 'ACCEPTED' ? 'Aceptada' :
-                                            workOrder.quotation?.status === 'PENDING' ? 'Pendiente' :
-                                                workOrder.quotation?.status === 'REJECTED' ? 'Rechazada' : workOrder.quotation?.status}
-                                    </Badge>
-                                </div>
-                                <div>
-                                    <p className="text-sm font-medium">Fecha de Cotización</p>
-                                    <p className="text-sm text-gray-600">
-                                        {workOrder.quotation?.createdAt ? new Date(workOrder.quotation.createdAt).toLocaleDateString() : '-'}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="text-sm font-medium">Total de Cotización</p>
-                                    <p className="text-sm text-gray-600">
-                                        ${workOrder.quotation?.estimatedTotal?.toLocaleString() || '0'}
-                                    </p>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                            </CardContent>
+                        </Card>
                     )}
 
                     {/* Items de la orden */}

@@ -27,13 +27,13 @@ export async function GET() {
         _sum: { total: true },
       }),
       prisma.quotation.count({
-        where: { status: "PENDING" },
+        where: { status: "pending" },
       }),
       prisma.workOrder.count({
-        where: { status: { in: ["PENDING", "IN_PROGRESS"] } },
+        where: { status: { in: ["pending", "in_progress"] } },
       }),
       prisma.sale.count({
-        where: { paymentStatus: { in: ["PENDING", "PARTIAL", "OVERDUE"] } },
+        where: { paymentStatus: { in: ["pending", "partial", "overdue"] } },
       }),
     ]);
 
@@ -120,10 +120,11 @@ export async function GET() {
     };
 
     workOrderStatus.forEach((item) => {
-      if (item.status === "PENDING") statusMap.pending = item._count.status;
-      if (item.status === "IN_PROGRESS") statusMap.inProgress = item._count.status;
-      if (item.status === "COMPLETED") statusMap.completed = item._count.status;
-      if (item.status === "CANCELLED") statusMap.cancelled = item._count.status;
+      if (item.status === "pending") statusMap.pending = item._count.status;
+      if (item.status === "in_progress")
+        statusMap.inProgress = item._count.status;
+      if (item.status === "completed") statusMap.completed = item._count.status;
+      if (item.status === "cancelled") statusMap.cancelled = item._count.status;
     });
 
     // Ventas por método de pago
@@ -139,22 +140,24 @@ export async function GET() {
       total: item._sum.total || 0,
     }));
 
-    return NextResponse.json(serializeBigInt({
-      totalClients,
-      totalVehicles,
-      totalQuotations,
-      totalWorkOrders,
-      totalSales,
-      totalRevenue: totalRevenue._sum.total || 0,
-      pendingQuotations,
-      pendingWorkOrders,
-      pendingPayments,
-      monthlyRevenue,
-      topProducts,
-      topClients,
-      workOrderStatus: statusMap,
-      salesByPaymentMethod: paymentMethods,
-    }));
+    return NextResponse.json(
+      serializeBigInt({
+        totalClients,
+        totalVehicles,
+        totalQuotations,
+        totalWorkOrders,
+        totalSales,
+        totalRevenue: totalRevenue._sum.total || 0,
+        pendingQuotations,
+        pendingWorkOrders,
+        pendingPayments,
+        monthlyRevenue,
+        topProducts,
+        topClients,
+        workOrderStatus: statusMap,
+        salesByPaymentMethod: paymentMethods,
+      }),
+    );
   } catch (error) {
     console.error("Error fetching dashboard report:", error);
     return NextResponse.json(

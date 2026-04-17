@@ -65,7 +65,7 @@ export async function GET() {
         FROM Product p
         LEFT JOIN OrderItem oi ON p.id = oi.productId
         LEFT JOIN WorkOrder wo ON oi.workOrderId = wo.id
-        WHERE wo.status = 'completed'
+        WHERE wo.status = 'COMPLETED'
         GROUP BY p.id, p.name, p.category
         ORDER BY revenue DESC
         LIMIT 20
@@ -114,23 +114,25 @@ export async function GET() {
       LIMIT 10
     `;
 
-    return NextResponse.json(serializeBigInt({
-      summary: {
-        totalProducts,
-        totalInventoryValue: inventoryValue._sum.quantity || 0,
-        lowStockCount: lowStockProducts.length,
-        outOfStockCount: outOfStockProducts.length,
-      },
-      productsByCategory: productsByCategory.map((item) => ({
-        category: item.category,
-        count: item._count.category,
-      })),
-      lowStockProducts,
-      outOfStockProducts,
-      topSellingProducts,
-      productsWithMostMovements,
-      recentMovements: productMovements,
-    }));
+    return NextResponse.json(
+      serializeBigInt({
+        summary: {
+          totalProducts,
+          totalInventoryValue: inventoryValue._sum.quantity || 0,
+          lowStockCount: lowStockProducts.length,
+          outOfStockCount: outOfStockProducts.length,
+        },
+        productsByCategory: productsByCategory.map((item) => ({
+          category: item.category,
+          count: item._count.category,
+        })),
+        lowStockProducts,
+        outOfStockProducts,
+        topSellingProducts,
+        productsWithMostMovements,
+        recentMovements: productMovements,
+      }),
+    );
   } catch (error) {
     console.error("Error fetching products report:", error);
     return NextResponse.json(

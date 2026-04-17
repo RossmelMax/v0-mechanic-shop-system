@@ -140,7 +140,7 @@ Una de las funcionalidades más poderosas del sistema es su **base de datos inte
 ### Órdenes de Trabajo
 
 - **Crear Orden**: Desde cotización aceptada o directamente
-- **Estados**: Pendiente → En Progreso → Completada → Entregada
+- **Estados**: Pendiente → En Progreso → COMPLETED → Entregada
 - **Items**: Productos y servicios utilizados
 - **Asignación**: Mecánico responsable
 - **Tiempos**: Estimados vs reales

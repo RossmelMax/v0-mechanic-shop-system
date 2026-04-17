@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (quotation.status !== "ACCEPTED") {
+    if (quotation.status !== "accepted") {
       return NextResponse.json(
         {
           error:
@@ -99,6 +99,12 @@ export async function POST(request: NextRequest) {
         vehicle: true,
         quotation: true,
       },
+    });
+
+    // Actualizar el estado de la cotización a "converted_to_order"
+    await prisma.quotation.update({
+      where: { id: data.quotationId },
+      data: { status: "converted_to_order" },
     });
 
     return NextResponse.json(workOrder, { status: 201 });

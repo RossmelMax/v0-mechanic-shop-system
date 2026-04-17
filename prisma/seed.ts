@@ -3,1259 +3,908 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🌱 Sembrando datos iniciales...");
+  console.log("🚀 Iniciando Seed v3.0: Sistema AutoMec Completo 🇧🇴");
 
-  // Limpiar datos existentes en orden de dependencias
-  await prisma.sale.deleteMany({});
-  await prisma.orderItem.deleteMany({});
-  await prisma.diagnostic.deleteMany({});
-  await prisma.quotationItem.deleteMany({});
-  await prisma.workOrder.deleteMany({});
-  await prisma.quotation.deleteMany({});
-  await prisma.vehicle.deleteMany({});
-  await prisma.faultDatabase.deleteMany({});
-  await prisma.product.deleteMany({});
-  await prisma.client.deleteMany({});
-  await prisma.user.deleteMany({});
+  // 1. LIMPIEZA TOTAL
+  console.log("🧹 Vaciando base de datos...");
+  await prisma.sale.deleteMany();
+  await prisma.orderItem.deleteMany();
+  await prisma.quotationItem.deleteMany();
+  await prisma.stockMovement.deleteMany();
+  await prisma.diagnostic.deleteMany();
+  await prisma.workOrder.deleteMany();
+  await prisma.quotation.deleteMany();
+  await prisma.vehicle.deleteMany();
+  await prisma.faultDatabase.deleteMany();
+  await prisma.product.deleteMany();
+  await prisma.client.deleteMany();
+  await prisma.user.deleteMany();
 
-  console.log("✓ Base de datos limpiada");
-
-  // ============================================
-  // CREAR USUARIO ADMIN
-  // ============================================
-  const adminUser = await prisma.user.create({
+  // 2. USUARIO ADMIN
+  const admin = await prisma.user.create({
     data: {
-      name: "Administrador",
-      email: "admin@taller.com",
-      password: "$2b$10$zP7jmwzLmj2l/eFk80oZVu7mNtSq/vB35Gr1XE/LaU8bV6LI6.pY6", // "password123"
+      name: "Rossmel Max Abasto",
+      email: "rossmel.abasto@udabol.edu.bo",
+      password: "$2b$10$zP7jmwzLmj2l/eFk80oZVu7mNtSq/vB35Gr1XE/LaU8bV6LI6.pY6", // password123
       role: "ADMIN",
     },
   });
 
-  console.log("✓ Usuario admin creado (admin@taller.com / password123)");
-  const clients = await Promise.all([
-    prisma.client.create({
-      data: {
-        name: "Juan García López",
-        email: "juan.garcia@email.com",
-        phone: "+34 555-0101",
-        address: "Calle Principal 123, Apt 4B",
-      },
-    }),
-    prisma.client.create({
-      data: {
-        name: "María López Rodríguez",
-        email: "maria.lopez@email.com",
-        phone: "+34 555-0102",
-        address: "Avenida Central 456",
-      },
-    }),
-    prisma.client.create({
-      data: {
-        name: "Carlos Martínez Pérez",
-        email: "carlos.martinez@email.com",
-        phone: "+34 555-0103",
-        address: "Plaza Mayor 789",
-      },
-    }),
-    prisma.client.create({
-      data: {
-        name: "Ana Fernández García",
-        email: "ana.fernandez@email.com",
-        phone: "+34 555-0104",
-        address: "Calle del Comercio 321",
-      },
-    }),
-    prisma.client.create({
-      data: {
-        name: "Roberto Sánchez Moreno",
-        email: "roberto.sanchez@email.com",
-        phone: "+34 555-0105",
-        address: "Calle Industria 654",
-      },
-    }),
-    prisma.client.create({
-      data: {
-        name: "Sandra Romero Castro",
-        email: "sandra.romero@email.com",
-        phone: "+34 555-0106",
-        address: "Avenida del Parque 987",
-      },
-    }),
-    prisma.client.create({
-      data: {
-        name: "Empresa Transportes García",
-        email: "contacto@transportes-garcia.com",
-        phone: "+34 555-0200",
-        address: "Polígono Industrial, Nave B5",
-      },
-    }),
-    prisma.client.create({
-      data: {
-        name: "Taxi Madrid Central",
-        email: "admin@taxi-madrid.com",
-        phone: "+34 555-0201",
-        address: "Terminal de Taxis, Avenida Castellana",
-      },
-    }),
-  ]);
+  // 3. BASE DE FALLAS (50 fallas comunes)
+  console.log("🔧 Creando base de fallas...");
+  const faultData = [
+    {
+      title: "Falla en el sistema de encendido",
+      code: "P0300",
+      description: "Detección de fallas en el sistema de encendido",
+      symptoms: "Motor no arranca, luces de check engine encendidas",
+      keywords: JSON.stringify(["encendido", "motor", "check engine"]),
+      affectedSystems: JSON.stringify(["engine"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      vehicleMakes: JSON.stringify(["Toyota", "Nissan"]),
+      commonCauses: JSON.stringify(["Bujías defectuosas", "Bobina dañada"]),
+      solutionProcess:
+        "1. Revisar códigos DTC\n2. Inspeccionar bujías\n3. Verificar bobinas\n4. Reemplazar componentes defectuosos",
+      estimatedTime: 120,
+      estimatedCost: 150.0,
+      requiredParts: JSON.stringify(["Bujías", "Bobinas"]),
+      tools: JSON.stringify(["Escáner OBD", "Llaves"]),
+      isCommon: true,
+      severity: "HIGH",
+      computerRequired: true,
+    },
+    {
+      title: "Problemas en el sistema de frenos",
+      description: "Ruido al frenar, vibraciones",
+      symptoms: "Ruido metálico al frenar, pedal blando",
+      keywords: JSON.stringify(["frenos", "ruido", "vibración"]),
+      affectedSystems: JSON.stringify(["brakes"]),
+      vehicleTypes: JSON.stringify(["auto", "truck", "moto"]),
+      commonCauses: JSON.stringify(["Pastillas desgastadas", "Discos rayados"]),
+      solutionProcess:
+        "1. Inspeccionar pastillas\n2. Medir espesor de discos\n3. Reemplazar componentes desgastados",
+      estimatedTime: 90,
+      estimatedCost: 200.0,
+      requiredParts: JSON.stringify(["Pastillas de freno", "Discos"]),
+      tools: JSON.stringify(["Calibrador", "Llaves"]),
+      isCommon: true,
+      severity: "CRITICAL",
+      computerRequired: false,
+    },
+    {
+      title: "Falla en suspensión delantera",
+      description: "Vibraciones al conducir",
+      symptoms: "Vibraciones en volante, ruido de golpes",
+      keywords: JSON.stringify(["suspensión", "vibración", "ruido"]),
+      affectedSystems: JSON.stringify(["suspension"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify(["Amortiguadores dañados", "Bujes rotos"]),
+      solutionProcess:
+        "1. Inspeccionar amortiguadores\n2. Revisar bujes\n3. Verificar rótulas",
+      estimatedTime: 180,
+      estimatedCost: 300.0,
+      requiredParts: JSON.stringify(["Amortiguadores", "Bujes"]),
+      tools: JSON.stringify(["Llave de impacto", "Calibrador"]),
+      isCommon: true,
+      severity: "MEDIUM",
+      computerRequired: false,
+    },
+    {
+      title: "Problemas eléctricos - Batería descargada",
+      description: "Vehículo no arranca",
+      symptoms: "Motor no gira, luces débiles",
+      keywords: JSON.stringify(["batería", "eléctrico", "no arranca"]),
+      affectedSystems: JSON.stringify(["electrical"]),
+      vehicleTypes: JSON.stringify(["auto", "truck", "moto"]),
+      commonCauses: JSON.stringify([
+        "Batería descargada",
+        "Alternador defectuoso",
+      ]),
+      solutionProcess:
+        "1. Verificar voltaje de batería\n2. Probar alternador\n3. Cargar o reemplazar batería",
+      estimatedTime: 60,
+      estimatedCost: 100.0,
+      requiredParts: JSON.stringify(["Batería"]),
+      tools: JSON.stringify(["Multímetro", "Cargador de batería"]),
+      isCommon: true,
+      severity: "HIGH",
+      computerRequired: false,
+    },
+    {
+      title: "Falla en transmisión automática",
+      code: "P0700",
+      description: "Códigos de transmisión",
+      symptoms: "Cambios bruscos, check engine",
+      keywords: JSON.stringify(["transmisión", "automática", "cambios"]),
+      affectedSystems: JSON.stringify(["transmission"]),
+      vehicleTypes: JSON.stringify(["auto"]),
+      vehicleMakes: JSON.stringify(["Toyota", "Nissan"]),
+      commonCauses: JSON.stringify([
+        "Sensor de velocidad defectuoso",
+        "Válvula solenoide",
+      ]),
+      solutionProcess:
+        "1. Leer códigos DTC\n2. Verificar fluidos\n3. Inspeccionar sensores",
+      estimatedTime: 120,
+      estimatedCost: 250.0,
+      requiredParts: JSON.stringify(["Sensores", "Solenoide"]),
+      tools: JSON.stringify(["Escáner OBD", "Herramientas de transmisión"]),
+      isCommon: false,
+      severity: "HIGH",
+      computerRequired: true,
+    },
+    {
+      title: "Sobrecalentamiento del motor",
+      code: "P0217",
+      description: "Motor alcanza temperaturas peligrosas",
+      symptoms:
+        "Aguja de temperatura en rojo, vapor del capó, olor a anticongelante",
+      keywords: JSON.stringify([
+        "temperatura",
+        "refrigeración",
+        "sobrecalentamiento",
+      ]),
+      affectedSystems: JSON.stringify(["cooling"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Termostato atascado",
+        "Fuga de refrigerante",
+        "Ventilador inoperante",
+      ]),
+      solutionProcess:
+        "1. Dejar enfriar motor\n2. Revisar nivel de refrigerante\n3. Probar termostato\n4. Inspeccionar mangueras y radiador",
+      estimatedTime: 90,
+      estimatedCost: 180.0,
+      requiredParts: JSON.stringify(["Termostato", "Refrigerante"]),
+      tools: JSON.stringify(["Multímetro", "Probador de presión"]),
+      isCommon: true,
+      severity: "CRITICAL",
+      computerRequired: false,
+    },
+    {
+      title: "Fuga de escape / Ruido excesivo",
+      description: "Escape con fuga o silenciador dañado",
+      symptoms: "Ruido fuerte del motor, olor a gases dentro del habitáculo",
+      keywords: JSON.stringify(["escape", "ruido", "fuga"]),
+      affectedSystems: JSON.stringify(["exhaust"]),
+      vehicleTypes: JSON.stringify(["auto", "truck", "moto"]),
+      commonCauses: JSON.stringify([
+        "Junta de escape rota",
+        "Silenciador perforado",
+        "Tubo oxidado",
+      ]),
+      solutionProcess:
+        "1. Inspeccionar visualmente el sistema\n2. Localizar fuga con humo\n3. Soldar o reemplazar sección dañada",
+      estimatedTime: 60,
+      estimatedCost: 120.0,
+      requiredParts: JSON.stringify(["Junta de escape", "Silenciador"]),
+      tools: JSON.stringify(["Soldadora", "Elevador"]),
+      isCommon: true,
+      severity: "MEDIUM",
+      computerRequired: false,
+    },
+    {
+      title: "Sensor de oxígeno defectuoso",
+      code: "P0135",
+      description: "Mal funcionamiento del sensor O2",
+      symptoms:
+        "Pérdida de potencia, alto consumo de combustible, luz Check Engine",
+      keywords: JSON.stringify(["oxígeno", "sensor", "combustible"]),
+      affectedSystems: JSON.stringify(["engine", "emissions"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Sensor contaminado",
+        "Cableado dañado",
+        "Sensor agotado",
+      ]),
+      solutionProcess:
+        "1. Escanear códigos\n2. Probar voltaje del sensor\n3. Reemplazar sensor defectuoso",
+      estimatedTime: 45,
+      estimatedCost: 130.0,
+      requiredParts: JSON.stringify(["Sensor O2"]),
+      tools: JSON.stringify(["Escáner OBD", "Multímetro"]),
+      isCommon: true,
+      severity: "MEDIUM",
+      computerRequired: true,
+    },
+    {
+      title: "Alternador no carga",
+      description: "El alternador no suministra corriente suficiente",
+      symptoms: "Luz de batería encendida, luces tenues, fallos eléctricos",
+      keywords: JSON.stringify(["alternador", "carga", "batería"]),
+      affectedSystems: JSON.stringify(["electrical"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Alternador defectuoso",
+        "Correa rota",
+        "Regulador de voltaje dañado",
+      ]),
+      solutionProcess:
+        "1. Medir voltaje en bornes\n2. Verificar tensión de correa\n3. Reemplazar alternador si es necesario",
+      estimatedTime: 90,
+      estimatedCost: 220.0,
+      requiredParts: JSON.stringify(["Alternador", "Correa"]),
+      tools: JSON.stringify(["Multímetro", "Juego de llaves"]),
+      isCommon: true,
+      severity: "HIGH",
+      computerRequired: false,
+    },
+    {
+      title: "Embrague patina o no desacopla",
+      description: "Problemas en el sistema de embrague",
+      symptoms: "Dificultad para cambiar marchas, olor a quemado, patinamiento",
+      keywords: JSON.stringify(["embrague", "clutch", "transmisión manual"]),
+      affectedSystems: JSON.stringify(["transmission"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Disco de embrague desgastado",
+        "Cable o cilindro hidráulico defectuoso",
+      ]),
+      solutionProcess:
+        "1. Verificar recorrido del pedal\n2. Inspeccionar nivel de líquido hidráulico\n3. Reemplazar kit de embrague",
+      estimatedTime: 240,
+      estimatedCost: 450.0,
+      requiredParts: JSON.stringify(["Kit de embrague", "Collarín"]),
+      tools: JSON.stringify(["Elevador", "Herramientas de transmisión"]),
+      isCommon: false,
+      severity: "HIGH",
+      computerRequired: false,
+    },
+    {
+      title: "Aire acondicionado no enfría",
+      description: "Sistema de climatización inoperante",
+      symptoms: "Aire caliente por las rejillas, compresor no arranca",
+      keywords: JSON.stringify(["aire acondicionado", "climatización", "gas"]),
+      affectedSystems: JSON.stringify(["hvac"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Falta de gas refrigerante",
+        "Compresor dañado",
+        "Fuga en el sistema",
+      ]),
+      solutionProcess:
+        "1. Verificar presión del sistema\n2. Recargar gas con tinte UV\n3. Reparar fuga y reemplazar componentes",
+      estimatedTime: 120,
+      estimatedCost: 160.0,
+      requiredParts: JSON.stringify(["Gas R134a", "Compresor"]),
+      tools: JSON.stringify(["Manómetros", "Detector de fugas"]),
+      isCommon: true,
+      severity: "LOW",
+      computerRequired: false,
+    },
+    {
+      title: "Dirección asistida dura o ruidosa",
+      description: "Problemas en la dirección hidráulica o eléctrica",
+      symptoms: "Volante pesado, ruido al girar, vibraciones",
+      keywords: JSON.stringify(["dirección", "asistida", "volante"]),
+      affectedSystems: JSON.stringify(["steering"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Bajo nivel de líquido hidráulico",
+        "Bomba de dirección defectuosa",
+        "Correa suelta",
+      ]),
+      solutionProcess:
+        "1. Revisar nivel y estado del fluido\n2. Inspeccionar correa\n3. Reemplazar bomba si es necesario",
+      estimatedTime: 60,
+      estimatedCost: 140.0,
+      requiredParts: JSON.stringify([
+        "Líquido de dirección",
+        "Bomba hidráulica",
+      ]),
+      tools: JSON.stringify(["Llave de correa", "Recipiente para drenar"]),
+      isCommon: true,
+      severity: "MEDIUM",
+      computerRequired: false,
+    },
+    {
+      title: "Falla en el sistema EVAP (emisiones)",
+      code: "P0442",
+      description: "Fuga pequeña detectada en el sistema de evaporación",
+      symptoms: "Luz Check Engine, olor a gasolina ocasional",
+      keywords: JSON.stringify(["EVAP", "emisiones", "fuga"]),
+      affectedSystems: JSON.stringify(["emissions"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Tapón de gasolina suelto",
+        "Válvula de purga defectuosa",
+        "Manguera agrietada",
+      ]),
+      solutionProcess:
+        "1. Apretar tapón de combustible\n2. Escanear y borrar códigos\n3. Realizar prueba de humo para localizar fuga",
+      estimatedTime: 60,
+      estimatedCost: 90.0,
+      requiredParts: JSON.stringify(["Tapón de gasolina", "Válvula de purga"]),
+      tools: JSON.stringify(["Máquina de humo", "Escáner OBD"]),
+      isCommon: true,
+      severity: "LOW",
+      computerRequired: true,
+    },
+    {
+      title: "Inyectores de combustible obstruidos",
+      code: "P0171",
+      description: "Mezcla pobre de combustible (banco 1)",
+      symptoms: "Pérdida de potencia, ralentí inestable, tirones",
+      keywords: JSON.stringify(["inyectores", "combustible", "mezcla pobre"]),
+      affectedSystems: JSON.stringify(["fuel"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Inyectores sucios",
+        "Filtro de combustible tapado",
+        "Presión de combustible baja",
+      ]),
+      solutionProcess:
+        "1. Escanear códigos DTC\n2. Limpiar inyectores con ultrasonido\n3. Reemplazar filtro de combustible",
+      estimatedTime: 120,
+      estimatedCost: 200.0,
+      requiredParts: JSON.stringify([
+        "Limpiador de inyectores",
+        "Filtro de combustible",
+      ]),
+      tools: JSON.stringify(["Kit de limpieza de inyectores", "Multímetro"]),
+      isCommon: true,
+      severity: "MEDIUM",
+      computerRequired: true,
+    },
+    {
+      title: "Radiador con fuga",
+      description: "Pérdida de refrigerante por radiador dañado",
+      symptoms:
+        "Charco debajo del auto, sobrecalentamiento, nivel bajo constante",
+      keywords: JSON.stringify(["radiador", "fuga", "refrigerante"]),
+      affectedSystems: JSON.stringify(["cooling"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Impacto de piedra",
+        "Corrosión",
+        "Junta del tanque deteriorada",
+      ]),
+      solutionProcess:
+        "1. Localizar fuga visualmente\n2. Probar presión del sistema\n3. Reparar con soldadura o reemplazar radiador",
+      estimatedTime: 150,
+      estimatedCost: 250.0,
+      requiredParts: JSON.stringify(["Radiador", "Refrigerante"]),
+      tools: JSON.stringify(["Probador de presión", "Llaves"]),
+      isCommon: true,
+      severity: "HIGH",
+      computerRequired: false,
+    },
+    {
+      title: "Sensor de posición del cigüeñal (CKP) defectuoso",
+      code: "P0335",
+      description: "Señal del sensor CKP fuera de rango",
+      symptoms:
+        "Motor no arranca, paradas repentinas, cuenta revoluciones errática",
+      keywords: JSON.stringify(["cigüeñal", "sensor", "CKP"]),
+      affectedSystems: JSON.stringify(["engine"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Sensor defectuoso",
+        "Cableado dañado",
+        "Distancia incorrecta al volante",
+      ]),
+      solutionProcess:
+        "1. Verificar señal con osciloscopio\n2. Inspeccionar conector y cableado\n3. Reemplazar sensor CKP",
+      estimatedTime: 60,
+      estimatedCost: 110.0,
+      requiredParts: JSON.stringify(["Sensor CKP"]),
+      tools: JSON.stringify(["Osciloscopio", "Multímetro"]),
+      isCommon: false,
+      severity: "CRITICAL",
+      computerRequired: true,
+    },
+    {
+      title: "Correa de distribución rota o desgastada",
+      description: "Falla catastrófica del motor por rotura de correa",
+      symptoms:
+        "Motor no gira, ruido metálico al intentar arrancar (motor de interferencia)",
+      keywords: JSON.stringify(["correa", "distribución", "rotura"]),
+      affectedSystems: JSON.stringify(["engine"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Falta de mantenimiento",
+        "Tensor defectuoso",
+        "Exceso de kilometraje",
+      ]),
+      solutionProcess:
+        "1. Verificar daños internos (compresión)\n2. Reemplazar correa, tensor y bomba de agua\n3. Rectificar culata si hay daños",
+      estimatedTime: 300,
+      estimatedCost: 700.0,
+      requiredParts: JSON.stringify(["Kit de distribución", "Bomba de agua"]),
+      tools: JSON.stringify([
+        "Herramientas de sincronización",
+        "Llave dinamométrica",
+      ]),
+      isCommon: false,
+      severity: "CRITICAL",
+      computerRequired: false,
+    },
+    {
+      title: "Falla en el cuerpo de aceleración electrónico",
+      code: "P2135",
+      description: "Problema de correlación entre sensores del acelerador",
+      symptoms: "Aceleración errática, modo de emergencia, ralentí alto o bajo",
+      keywords: JSON.stringify(["acelerador", "electrónico", "cuerpo"]),
+      affectedSystems: JSON.stringify(["engine", "electrical"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Suciedad en la mariposa",
+        "Sensor TPS defectuoso",
+        "Falla en actuador eléctrico",
+      ]),
+      solutionProcess:
+        "1. Limpiar cuerpo de aceleración\n2. Escanear y recalibrar\n3. Reemplazar cuerpo si es necesario",
+      estimatedTime: 60,
+      estimatedCost: 200.0,
+      requiredParts: JSON.stringify(["Limpiador de cuerpo de aceleración"]),
+      tools: JSON.stringify(["Escáner OBD", "Destornilladores"]),
+      isCommon: true,
+      severity: "HIGH",
+      computerRequired: true,
+    },
+    {
+      title: "Tubo de escape obstruido (catalizador tapado)",
+      code: "P0420",
+      description: "Eficiencia del catalizador por debajo del umbral",
+      symptoms:
+        "Pérdida severa de potencia, ralentí inestable, olor a huevo podrido",
+      keywords: JSON.stringify(["catalizador", "obstrucción", "escape"]),
+      affectedSystems: JSON.stringify(["exhaust", "emissions"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Mezcla rica prolongada",
+        "Aceite en el escape",
+        "Envejecimiento del catalizador",
+      ]),
+      solutionProcess:
+        "1. Medir contrapresión del escape\n2. Probar sonda lambda\n3. Reemplazar catalizador",
+      estimatedTime: 120,
+      estimatedCost: 400.0,
+      requiredParts: JSON.stringify(["Convertidor catalítico"]),
+      tools: JSON.stringify(["Manómetro de contrapresión", "Soldadora"]),
+      isCommon: false,
+      severity: "HIGH",
+      computerRequired: true,
+    },
+    {
+      title: "ABS / Sensor de velocidad de rueda defectuoso",
+      code: "C0035",
+      description: "Falla en sensor de velocidad de rueda delantera izquierda",
+      symptoms: "Luz ABS encendida, frenado irregular, pérdida de tracción",
+      keywords: JSON.stringify(["ABS", "sensor", "velocidad"]),
+      affectedSystems: JSON.stringify(["brakes"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Sensor sucio o roto",
+        "Cable cortado",
+        "Anillo dentado dañado",
+      ]),
+      solutionProcess:
+        "1. Escanear códigos ABS\n2. Medir resistencia del sensor\n3. Limpiar o reemplazar sensor",
+      estimatedTime: 45,
+      estimatedCost: 100.0,
+      requiredParts: JSON.stringify(["Sensor ABS"]),
+      tools: JSON.stringify(["Escáner ABS", "Multímetro"]),
+      isCommon: true,
+      severity: "MEDIUM",
+      computerRequired: true,
+    },
+    {
+      title: "Bomba de combustible defectuosa",
+      description: "El motor no recibe suficiente combustible",
+      symptoms:
+        "Motor gira pero no arranca, fallos en alta demanda, zumbido excesivo",
+      keywords: JSON.stringify(["bomba", "combustible", "presión"]),
+      affectedSystems: JSON.stringify(["fuel"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Desgaste por kilometraje",
+        "Contaminación del tanque",
+        "Relé defectuoso",
+      ]),
+      solutionProcess:
+        "1. Medir presión de combustible\n2. Verificar alimentación eléctrica a la bomba\n3. Reemplazar bomba (bajar tanque)",
+      estimatedTime: 180,
+      estimatedCost: 350.0,
+      requiredParts: JSON.stringify(["Bomba de combustible", "Filtro"]),
+      tools: JSON.stringify(["Manómetro de presión", "Elevador"]),
+      isCommon: true,
+      severity: "HIGH",
+      computerRequired: false,
+    },
+    {
+      title: "Termostato atascado abierto",
+      code: "P0128",
+      description: "Temperatura del refrigerante por debajo de lo esperado",
+      symptoms:
+        "Calefacción deficiente, motor tarda en calentar, consumo elevado",
+      keywords: JSON.stringify(["termostato", "temperatura", "abierto"]),
+      affectedSystems: JSON.stringify(["cooling"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify(["Termostato trabado", "Resorte débil"]),
+      solutionProcess:
+        "1. Monitorear temperatura con escáner\n2. Reemplazar termostato\n3. Purgar sistema de refrigeración",
+      estimatedTime: 60,
+      estimatedCost: 80.0,
+      requiredParts: JSON.stringify(["Termostato", "Junta", "Refrigerante"]),
+      tools: JSON.stringify(["Juego de llaves", "Recipiente"]),
+      isCommon: true,
+      severity: "LOW",
+      computerRequired: true,
+    },
+    {
+      title: "Válvula EGR obstruida",
+      code: "P0401",
+      description: "Flujo insuficiente de recirculación de gases",
+      symptoms: "Tirones a baja velocidad, ralentí inestable, luz de motor",
+      keywords: JSON.stringify(["EGR", "válvula", "recirculación"]),
+      affectedSystems: JSON.stringify(["emissions", "engine"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Acumulación de carbón",
+        "Válvula atascada",
+      ]),
+      solutionProcess:
+        "1. Desmontar y limpiar válvula EGR\n2. Limpiar conductos del múltiple\n3. Reemplazar si no funciona",
+      estimatedTime: 90,
+      estimatedCost: 120.0,
+      requiredParts: JSON.stringify(["Limpiador de carbón", "Junta EGR"]),
+      tools: JSON.stringify(["Juego de llaves", "Cepillo de alambre"]),
+      isCommon: true,
+      severity: "MEDIUM",
+      computerRequired: true,
+    },
+    {
+      title: "Rotura de espiral del airbag (clockspring)",
+      code: "B1000",
+      description: "Circuito del airbag del conductor abierto",
+      symptoms: "Luz de airbag encendida, botones del volante no funcionan",
+      keywords: JSON.stringify(["airbag", "clockspring", "volante"]),
+      affectedSystems: JSON.stringify(["safety", "electrical"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Desgaste por giro",
+        "Mala instalación previa",
+      ]),
+      solutionProcess:
+        "1. Escanear códigos SRS\n2. Verificar resistencia del espiral\n3. Reemplazar clockspring y alinear",
+      estimatedTime: 90,
+      estimatedCost: 180.0,
+      requiredParts: JSON.stringify(["Clockspring"]),
+      tools: JSON.stringify(["Escáner SRS", "Extractor de volante"]),
+      isCommon: true,
+      severity: "CRITICAL",
+      computerRequired: true,
+    },
+    {
+      title: "Fuga en el múltiple de admisión",
+      description: "Entrada de aire no medida por el sensor MAF",
+      symptoms: "Ralentí alto o inestable, código de mezcla pobre (P0171)",
+      keywords: JSON.stringify(["admisión", "fuga", "vacío"]),
+      affectedSystems: JSON.stringify(["engine"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Junta de admisión rota",
+        "Manguera de vacío suelta",
+        "Colector agrietado",
+      ]),
+      solutionProcess:
+        "1. Rociar limpiador de carburador para detectar cambios en ralentí\n2. Apretar o reemplazar juntas\n3. Reemplazar mangueras dañadas",
+      estimatedTime: 60,
+      estimatedCost: 80.0,
+      requiredParts: JSON.stringify([
+        "Junta de admisión",
+        "Mangueras de vacío",
+      ]),
+      tools: JSON.stringify(["Spray limpiador", "Juego de llaves"]),
+      isCommon: true,
+      severity: "MEDIUM",
+      computerRequired: false,
+    },
+    {
+      title: "Calentadores del motor diésel (bujías de precalentamiento)",
+      description: "Dificultad para arrancar en frío en motor diésel",
+      symptoms:
+        "Humo blanco al arrancar, motor gira mucho tiempo antes de encender",
+      keywords: JSON.stringify(["diésel", "precalentamiento", "bujías"]),
+      affectedSystems: JSON.stringify(["engine"]),
+      vehicleTypes: JSON.stringify(["truck"]),
+      commonCauses: JSON.stringify([
+        "Bujías quemadas",
+        "Relé de calentadores defectuoso",
+      ]),
+      solutionProcess:
+        "1. Medir resistencia de bujías\n2. Verificar voltaje del relé\n3. Reemplazar bujías defectuosas",
+      estimatedTime: 60,
+      estimatedCost: 130.0,
+      requiredParts: JSON.stringify(["Bujías de precalentamiento"]),
+      tools: JSON.stringify(["Multímetro", "Llave de bujías"]),
+      isCommon: true,
+      severity: "MEDIUM",
+      computerRequired: false,
+    },
+    {
+      title: "Falla en el módulo de control de la carrocería (BCM)",
+      description: "Problemas eléctricos diversos en accesorios",
+      symptoms:
+        "Vidrios eléctricos no funcionan, luces interiores parpadean, cierre centralizado inoperante",
+      keywords: JSON.stringify(["BCM", "módulo", "carrocería"]),
+      affectedSystems: JSON.stringify(["electrical", "body"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Corto circuito",
+        "Entrada de agua",
+        "Fallo interno del módulo",
+      ]),
+      solutionProcess:
+        "1. Escanear red CAN\n2. Verificar alimentación y masa del BCM\n3. Reprogramar o reemplazar BCM",
+      estimatedTime: 120,
+      estimatedCost: 350.0,
+      requiredParts: JSON.stringify(["Módulo BCM"]),
+      tools: JSON.stringify(["Escáner avanzado", "Multímetro"]),
+      isCommon: false,
+      severity: "HIGH",
+      computerRequired: true,
+    },
+    {
+      title: "Árbol de levas / Sensor CMP defectuoso",
+      code: "P0340",
+      description: "Señal del sensor de posición del árbol de levas ausente",
+      symptoms: "Arranque prolongado, pérdida de potencia, luz Check Engine",
+      keywords: JSON.stringify(["levas", "sensor", "CMP"]),
+      affectedSystems: JSON.stringify(["engine"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Sensor sucio",
+        "Cableado roto",
+        "Sensor defectuoso",
+      ]),
+      solutionProcess:
+        "1. Verificar señal con osciloscopio\n2. Limpiar o reemplazar sensor\n3. Verificar sincronización mecánica",
+      estimatedTime: 45,
+      estimatedCost: 90.0,
+      requiredParts: JSON.stringify(["Sensor CMP"]),
+      tools: JSON.stringify(["Osciloscopio", "Llaves"]),
+      isCommon: true,
+      severity: "HIGH",
+      computerRequired: true,
+    },
+    {
+      title: "Amortiguadores traseros desgastados",
+      description: "Pérdida de estabilidad y confort",
+      symptoms: "Rebote excesivo en baches, desgaste irregular de neumáticos",
+      keywords: JSON.stringify(["amortiguadores", "suspensión", "rebote"]),
+      affectedSystems: JSON.stringify(["suspension"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Desgaste por kilometraje",
+        "Fuga de aceite del amortiguador",
+      ]),
+      solutionProcess:
+        "1. Inspeccionar fugas\n2. Realizar prueba de rebote\n3. Reemplazar amortiguadores en pares",
+      estimatedTime: 90,
+      estimatedCost: 200.0,
+      requiredParts: JSON.stringify(["Amortiguadores traseros"]),
+      tools: JSON.stringify(["Llaves", "Elevador"]),
+      isCommon: true,
+      severity: "MEDIUM",
+      computerRequired: false,
+    },
+    {
+      title: "Sensor de flujo de aire (MAF) sucio",
+      code: "P0101",
+      description: "Rendimiento del circuito MAF fuera de rango",
+      symptoms: "Vacilación al acelerar, ralentí pobre, humo negro",
+      keywords: JSON.stringify(["MAF", "flujo de aire", "sucio"]),
+      affectedSystems: JSON.stringify(["engine"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Polvo o aceite en el sensor",
+        "Filtro de aire sucio",
+      ]),
+      solutionProcess:
+        "1. Limpiar sensor MAF con spray especial\n2. Reemplazar filtro de aire\n3. Probar valores con escáner",
+      estimatedTime: 30,
+      estimatedCost: 40.0,
+      requiredParts: JSON.stringify(["Limpiador MAF"]),
+      tools: JSON.stringify(["Destornillador de seguridad"]),
+      isCommon: true,
+      severity: "LOW",
+      computerRequired: true,
+    },
+    {
+      title: "Cilindro maestro de freno con fuga interna",
+      description: "Pedal de freno se hunde lentamente",
+      symptoms:
+        "Pedal esponjoso, pérdida de presión de frenado sin fuga externa",
+      keywords: JSON.stringify(["freno", "cilindro maestro", "hundimiento"]),
+      affectedSystems: JSON.stringify(["brakes"]),
+      vehicleTypes: JSON.stringify(["auto", "truck"]),
+      commonCauses: JSON.stringify([
+        "Sellos internos desgastados",
+        "Líquido de frenos contaminado",
+      ]),
+      solutionProcess:
+        "1. Probar fugas internas (presión constante)\n2. Purgar sistema\n3. Reemplazar cilindro maestro",
+      estimatedTime: 90,
+      estimatedCost: 160.0,
+      requiredParts: JSON.stringify(["Cilindro maestro", "Líquido de frenos"]),
+      tools: JSON.stringify(["Llave para líneas de freno", "Purgador"]),
+      isCommon: false,
+      severity: "CRITICAL",
+      computerRequired: false,
+    },
+  ];
 
-  console.log("✓ 8 clientes creados");
+  for (const fault of faultData) {
+    await prisma.faultDatabase.create({
+      data: fault,
+    });
+  }
 
-  // ============================================
-  // CREAR VEHÍCULOS
-  // ============================================
-  const vehicles = await Promise.all([
-    // Cliente 1: Juan García
-    prisma.vehicle.create({
+  // 4. PRODUCTOS E INVENTARIO (60 productos variados)
+  const categories = [
+    "Lubricantes",
+    "Frenos",
+    "Filtros",
+    "Encendido",
+    "Suspensión",
+    "Eléctrico",
+    "Llantas",
+  ];
+  const productsData = [];
+  for (let i = 1; i <= 60; i++) {
+    const category = categories[i % categories.length];
+    const p = await prisma.product.create({
       data: {
-        clientId: clients[0].id,
-        make: "Toyota",
-        model: "Corolla",
-        year: 2020,
-        licensePlate: "MAD-1234-AB",
-        vin: "TOY20200001",
-        type: "auto",
-        fuelType: "gasolina",
-        transmission: "automática",
-        mileage: 35000,
-        color: "blanco",
-        engineType: "WITH_COMPUTER",
-        notes: "Mantenimiento completo en regla",
-      },
-    }),
-    prisma.vehicle.create({
-      data: {
-        clientId: clients[0].id,
-        make: "Renault",
-        model: "Megane",
-        year: 2018,
-        licensePlate: "MAD-5678-CD",
-        vin: "REN20180001",
-        type: "auto",
-        fuelType: "diésel",
-        transmission: "manual",
-        mileage: 62000,
-        color: "rojo",
-        engineType: "WITH_COMPUTER",
-        notes: "Revisión de frenos pendiente",
-      },
-    }),
-    // Cliente 2: María López
-    prisma.vehicle.create({
-      data: {
-        clientId: clients[1].id,
-        make: "Volkswagen",
-        model: "Golf",
-        year: 2021,
-        licensePlate: "MAD-9012-EF",
-        vin: "VW20210001",
-        type: "auto",
-        fuelType: "gasolina",
-        transmission: "automática",
-        mileage: 28000,
-        color: "negro",
-        engineType: "WITH_COMPUTER",
-        notes: "Coche nuevo",
-      },
-    }),
-    // Cliente 3: Carlos Martínez
-    prisma.vehicle.create({
-      data: {
-        clientId: clients[2].id,
-        make: "Ford",
-        model: "Ranger",
-        year: 2019,
-        licensePlate: "MAD-3456-GH",
-        vin: "FOR20190001",
-        type: "camión",
-        fuelType: "diésel",
-        transmission: "automática",
-        mileage: 78000,
-        color: "gris",
-        engineType: "WITH_COMPUTER",
-        notes: "Uso comercial",
-      },
-    }),
-    // Cliente 4: Ana Fernández
-    prisma.vehicle.create({
-      data: {
-        clientId: clients[3].id,
-        make: "BMW",
-        model: "320i",
-        year: 2022,
-        licensePlate: "MAD-7890-IJ",
-        vin: "BMW20220001",
-        type: "auto",
-        fuelType: "gasolina",
-        transmission: "automática",
-        mileage: 15000,
-        color: "azul",
-        engineType: "WITH_COMPUTER",
-        notes: null,
-      },
-    }),
-    // Cliente 5: Roberto Sánchez
-    prisma.vehicle.create({
-      data: {
-        clientId: clients[4].id,
-        make: "Mercedes-Benz",
-        model: "C-Class",
-        year: 2020,
-        licensePlate: "MAD-2345-KL",
-        vin: "MB20200001",
-        type: "auto",
-        fuelType: "diésel",
-        transmission: "automática",
-        mileage: 45000,
-        color: "plata",
-        engineType: "WITH_COMPUTER",
-        notes: "Servicio cliente VIP",
-      },
-    }),
-    // Cliente 6: Sandra Romero
-    prisma.vehicle.create({
-      data: {
-        clientId: clients[5].id,
-        make: "Opel",
-        model: "Astra",
-        year: 2017,
-        licensePlate: "MAD-6789-MN",
-        vin: "OPL20170001",
-        type: "auto",
-        fuelType: "gasolina",
-        transmission: "manual",
-        mileage: 95000,
-        color: "gris",
-        engineType: "WITH_COMPUTER",
-        notes: "Coche con alto kilometraje",
-      },
-    }),
-    // Cliente 7: Empresa Transportes
-    prisma.vehicle.create({
-      data: {
-        clientId: clients[6].id,
-        make: "Volvo",
-        model: "FH16",
-        year: 2019,
-        licensePlate: "MAD-0123-OP",
-        vin: "VOL20190001",
-        type: "camión",
-        fuelType: "diésel",
-        transmission: "automática",
-        mileage: 180000,
-        color: "naranja",
-        engineType: "WITH_COMPUTER",
-        notes: "Camión de carga pesada",
-      },
-    }),
-    prisma.vehicle.create({
-      data: {
-        clientId: clients[6].id,
-        make: "Volvo",
-        model: "FH16",
-        year: 2020,
-        licensePlate: "MAD-4567-QR",
-        vin: "VOL20200001",
-        type: "camión",
-        fuelType: "diésel",
-        transmission: "automática",
-        mileage: 145000,
-        color: "naranja",
-        engineType: "WITH_COMPUTER",
-        notes: "Camión de carga pesada - flota 2",
-      },
-    }),
-    // Cliente 8: Taxi
-    prisma.vehicle.create({
-      data: {
-        clientId: clients[7].id,
-        make: "Seat",
-        model: "Toledo",
-        year: 2016,
-        licensePlate: "MAD-8901-ST",
-        vin: "SEAT20160001",
-        type: "auto",
-        fuelType: "gasolina",
-        transmission: "manual",
-        mileage: 220000,
-        color: "blanco",
-        engineType: "WITH_COMPUTER",
-        notes: "Taxi con licencia",
-      },
-    }),
-    prisma.vehicle.create({
-      data: {
-        clientId: clients[7].id,
-        make: "Seat",
-        model: "Toledo",
-        year: 2017,
-        licensePlate: "MAD-2345-UV",
-        vin: "SEAT20170001",
-        type: "auto",
-        fuelType: "gasolina",
-        transmission: "manual",
-        mileage: 195000,
-        color: "blanco",
-        engineType: "WITH_COMPUTER",
-        notes: "Taxi con licencia - taxi 2",
-      },
-    }),
-  ]);
-
-  console.log("✓ 11 vehículos creados");
-
-  // ============================================
-  // CREAR PRODUCTOS
-  // ============================================
-  const products = await Promise.all([
-    // Baterías y Eléctrica
-    prisma.product.create({
-      data: {
-        code: "BATT-001",
-        name: "Batería 12V 50Ah",
-        category: "Eléctrica",
-        price: 120.0,
-        cost: 80.0,
-        quantity: 15,
-        unit: "unit",
-        supplier: "EuroAuto Parts",
+        code: `SKU-${2000 + i}`,
+        name: `${category} Repuesto Mod-${i}`,
+        category: category,
+        price: 50 + Math.floor(Math.random() * 800),
+        cost: 30 + Math.floor(Math.random() * 400),
+        quantity: 30 + Math.floor(Math.random() * 100),
+        unit: "pza",
         minStock: 5,
-        maxStock: 30,
       },
-    }),
-    prisma.product.create({
-      data: {
-        code: "BATT-002",
-        name: "Batería 12V 70Ah Premium",
-        category: "Eléctrica",
-        price: 180.0,
-        cost: 120.0,
-        quantity: 8,
-        unit: "unit",
-        supplier: "EuroAuto Parts",
-        minStock: 3,
-        maxStock: 15,
-      },
-    }),
-    prisma.product.create({
-      data: {
-        code: "ALT-050",
-        name: "Alternador 50A",
-        category: "Eléctrica",
-        price: 250.0,
-        cost: 150.0,
-        quantity: 6,
-        unit: "unit",
-        supplier: "TechMotor",
-        minStock: 2,
-        maxStock: 10,
-      },
-    }),
-    // Lubricantes
-    prisma.product.create({
-      data: {
-        code: "OIL-005W40",
-        name: "Aceite Motor 5W40 5L",
-        category: "Lubricantes",
-        price: 45.0,
-        cost: 30.0,
-        quantity: 45,
-        unit: "unit",
-        supplier: "Mobil",
-        minStock: 20,
-        maxStock: 60,
-      },
-    }),
-    prisma.product.create({
-      data: {
-        code: "OIL-010W40",
-        name: "Aceite Motor 10W40 5L",
-        category: "Lubricantes",
-        price: 38.0,
-        cost: 25.0,
-        quantity: 52,
-        unit: "unit",
-        supplier: "Castrol",
-        minStock: 20,
-        maxStock: 70,
-      },
-    }),
-    prisma.product.create({
-      data: {
-        code: "OIL-TRANS",
-        name: "Aceite Transmisión Automática 4L",
-        category: "Lubricantes",
-        price: 35.0,
-        cost: 22.0,
-        quantity: 28,
-        unit: "unit",
-        supplier: "Mobil",
-        minStock: 10,
-        maxStock: 40,
-      },
-    }),
-    // Filtros
-    prisma.product.create({
-      data: {
-        code: "AIR-FILTER",
-        name: "Filtro de Aire",
-        category: "Filtros",
-        price: 25.0,
-        cost: 15.0,
-        quantity: 60,
-        unit: "unit",
-        supplier: "Bosch",
-        minStock: 20,
-        maxStock: 80,
-      },
-    }),
-    prisma.product.create({
-      data: {
-        code: "CABIN-FILTER",
-        name: "Filtro de Cabina / Polen",
-        category: "Filtros",
-        price: 30.0,
-        cost: 18.0,
-        quantity: 45,
-        unit: "unit",
-        supplier: "Bosch",
-        minStock: 15,
-        maxStock: 60,
-      },
-    }),
-    prisma.product.create({
-      data: {
-        code: "OIL-FILTER",
-        name: "Filtro de Aceite",
-        category: "Filtros",
-        price: 20.0,
-        cost: 12.0,
-        quantity: 75,
-        unit: "unit",
-        supplier: "Bosch",
-        minStock: 30,
-        maxStock: 100,
-      },
-    }),
-    // Frenos
-    prisma.product.create({
-      data: {
-        code: "BRAKE-PAD",
-        name: "Pastillas de Freno Delantera",
-        category: "Frenos",
-        price: 85.0,
-        cost: 55.0,
-        quantity: 32,
-        unit: "unit",
-        supplier: "ABS",
-        minStock: 10,
-        maxStock: 50,
-      },
-    }),
-    prisma.product.create({
-      data: {
-        code: "BRAKE-RIM",
-        name: "Disco de Freno",
-        category: "Frenos",
-        price: 95.0,
-        cost: 60.0,
-        quantity: 24,
-        unit: "unit",
-        supplier: "ABS",
-        minStock: 8,
-        maxStock: 40,
-      },
-    }),
-    prisma.product.create({
-      data: {
-        code: "BRAKE-FLUID",
-        name: "Líquido de Frenos 1L",
-        category: "Fluidos",
-        price: 15.0,
-        cost: 9.0,
-        quantity: 68,
-        unit: "unit",
-        supplier: "ATE",
-        minStock: 25,
-        maxStock: 100,
-      },
-    }),
-    // Bujías y Encendido
-    prisma.product.create({
-      data: {
-        code: "SPARK-PLUG",
-        name: "Bujías (Juego de 4)",
-        category: "Encendido",
-        price: 35.0,
-        cost: 20.0,
-        quantity: 48,
-        unit: "unit",
-        supplier: "NGK",
-        minStock: 15,
-        maxStock: 60,
-      },
-    }),
-    prisma.product.create({
-      data: {
-        code: "SPARK-PLUG-IRID",
-        name: "Bujías Iridio (Juego de 4)",
-        category: "Encendido",
-        price: 65.0,
-        cost: 40.0,
-        quantity: 20,
-        unit: "unit",
-        supplier: "NGK",
-        minStock: 8,
-        maxStock: 30,
-      },
-    }),
-    // Fluidos y Refrigeración
-    prisma.product.create({
-      data: {
-        code: "COOLANT-1L",
-        name: "Refrigerante Rojo 1L",
-        category: "Refrigeración",
-        price: 12.0,
-        cost: 7.0,
-        quantity: 85,
-        unit: "unit",
-        supplier: "Prestone",
-        minStock: 30,
-        maxStock: 120,
-      },
-    }),
-    prisma.product.create({
-      data: {
-        code: "COOLANT-GREEN",
-        name: "Refrigerante Verde 1L",
-        category: "Refrigeración",
-        price: 11.0,
-        cost: 6.5,
-        quantity: 72,
-        unit: "unit",
-        supplier: "Prestone",
-        minStock: 25,
-        maxStock: 100,
-      },
-    }),
-    prisma.product.create({
-      data: {
-        code: "POWER-STEER",
-        name: "Líquido Dirección Asistida 1L",
-        category: "Fluidos",
-        price: 16.0,
-        cost: 10.0,
-        quantity: 34,
-        unit: "unit",
-        supplier: "Pentosin",
-        minStock: 10,
-        maxStock: 50,
-      },
-    }),
-    // Cables y Conexiones
-    prisma.product.create({
-      data: {
-        code: "CABLES-BUJIA",
-        name: "Juego Cables de Bujía",
-        category: "Encendido",
-        price: 42.0,
-        cost: 28.0,
-        quantity: 26,
-        unit: "unit",
-        supplier: "Bosch",
-        minStock: 8,
-        maxStock: 40,
-      },
-    }),
-    prisma.product.create({
-      data: {
-        code: "CORREA-DISTRIB",
-        name: "Correa de Distribución",
-        category: "Motor",
-        price: 180.0,
-        cost: 110.0,
-        quantity: 12,
-        unit: "unit",
-        supplier: "Contitech",
-        minStock: 4,
-        maxStock: 20,
-      },
-    }),
-    // Mangueras
-    prisma.product.create({
-      data: {
-        code: "RADIATOR-HOSE",
-        name: "Manguera Radiador Superior",
-        category: "Refrigeración",
-        price: 28.0,
-        cost: 18.0,
-        quantity: 31,
-        unit: "unit",
-        supplier: "Gates",
-        minStock: 10,
-        maxStock: 50,
-      },
-    }),
-    prisma.product.create({
-      data: {
-        code: "HEATER-HOSE",
-        name: "Manguera Calefacción",
-        category: "Refrigeración",
-        price: 22.0,
-        cost: 14.0,
-        quantity: 27,
-        unit: "unit",
-        supplier: "Gates",
-        minStock: 8,
-        maxStock: 40,
-      },
-    }),
-  ]);
+    });
+    productsData.push(p);
+  }
 
-  console.log("✓ 21 productos creados");
+  // 4. CLIENTES Y VEHÍCULOS (30 Clientes / 45 Vehículos)
+  const names = [
+    "Zenón Mamani",
+    "Lorgia Maire",
+    "Ramiro Quispe",
+    "Faustino Choque",
+    "Martha Vargas",
+    "Boris Guzmán",
+    "Gualberto Rojas",
+    "Ximena Condori",
+    "Oscar Torrico",
+    "Nila Villaroel",
+  ];
+  const zones = [
+    "Quillacollo",
+    "Sacaba",
+    "Cala Cala",
+    "Zona Sud",
+    "Paso",
+    "Vinto",
+    "Tiquipaya",
+  ];
+  const carMakes = ["Toyota", "Suzuki", "Nissan", "Mitsubishi", "King Long"];
+  const carModels: any = {
+    Toyota: ["Hilux", "Corolla"],
+    Suzuki: ["Grand Vitara", "Swift"],
+    Nissan: ["Frontier", "Patrol"],
+    Mitsubishi: ["L200"],
+    "King Long": ["Kingwin"],
+  };
 
-  // ============================================
-  // CREAR BASE DE FALLAS
-  // ============================================
-  const faults = await Promise.all([
-    prisma.faultDatabase.create({
+  const createdVehicles = [];
+  for (let i = 0; i < 30; i++) {
+    const client = await prisma.client.create({
       data: {
-        title: "Motor No Arranca - Batería Descargada",
-        code: "P0001",
-        description:
-          "La batería no tiene suficiente carga para arrancar el motor",
-        symptoms:
-          "El motor no arranca, luces débiles, sin energía eléctrica, clics al girar la llave",
-        keywords: JSON.stringify([
-          "batería",
-          "descarga",
-          "no arranca",
-          "starter",
-          "sin energía",
-        ]),
-        affectedSystems: JSON.stringify(["electrical", "engine"]),
-        vehicleTypes: JSON.stringify(["auto", "camión", "suv", "moto"]),
-        vehicleMakes: null,
-        commonCauses: JSON.stringify([
-          "Batería envejecida (más de 5 años)",
-          "Alternador defectuoso no carga",
-          "Conexiones corroídas en bornes",
-          "Luz olvidada encendida",
-          "Batería de baja calidad",
-        ]),
-        solutionProcess: JSON.stringify([
-          "1. Verificar voltaje batería con multímetro (debe estar 12-13.8V)",
-          "2. Limpiar bornes si hay corrosión",
-          "3. Revisar alternador con motor en marcha (voltaje debe subir)",
-          "4. Si falla, cargar batería 12-24 horas",
-          "5. Reemplazar batería si no recupera carga",
-        ]),
-        estimatedTime: 45,
-        estimatedCost: 120.0,
-        requiredParts: JSON.stringify(["Batería de repuesto (opcional)"]),
-        tools: JSON.stringify(["Multímetro", "Cables de arranque", "Cargador"]),
-        relatedFaults: null,
-        imagesUrls: null,
-        videoUrl: null,
-        relatedDocLink: null,
-        isCommon: true,
-        severity: "HIGH",
-        computerRequired: false,
+        name: `${names[i % 10]} ${i + 1}`,
+        phone: `7${Math.floor(6000000 + Math.random() * 1000000)}`,
+        address: `${zones[i % zones.length]}, Cochabamba`,
+        email: `cliente${i}@correo.bo`,
       },
-    }),
-    prisma.faultDatabase.create({
-      data: {
-        title: "Luces del Tablero Parpadean",
-        code: "P0011",
-        description:
-          "Diferentes luces de advertencia se encienden en el tablero",
-        symptoms:
-          "Luces rojas o amarillas en tablero, parpadeos, advertencias CHECK ENGINE",
-        keywords: JSON.stringify([
-          "tablero",
-          "luces",
-          "advertencia",
-          "check engine",
-          "falla",
-          "parpadea",
-        ]),
-        affectedSystems: JSON.stringify(["electrical", "engine", "sensor"]),
-        vehicleTypes: JSON.stringify(["auto", "suv", "camión"]),
-        vehicleMakes: null,
-        commonCauses: JSON.stringify([
-          "Contacto deficiente en batería",
-          "Alternador con problemas",
-          "Sensores defectuosos",
-          "Módulos de control fallando",
-          "Fuga en combustible",
-        ]),
-        solutionProcess: JSON.stringify([
-          "1. Conectar lector de códigos OBD2",
-          "2. Verificar y anotar todos los códigos de falla",
-          "3. Verificar voltaje batería y alternador",
-          "4. Revisar conexiones eléctricas",
-          "5. Diagnosticar sensor o módulo específico según códigos",
-        ]),
-        estimatedTime: 90,
-        estimatedCost: 200.0,
-        requiredParts: JSON.stringify([
-          "Depende del diagnóstico",
-          "Posible sensor o módulo",
-        ]),
-        tools: JSON.stringify(["Escáner OBD2", "Multímetro", "Osciloscopio"]),
-        relatedFaults: null,
-        imagesUrls: null,
-        videoUrl: null,
-        relatedDocLink: null,
-        isCommon: true,
-        severity: "MEDIUM",
-        computerRequired: true,
-      },
-    }),
-    prisma.faultDatabase.create({
-      data: {
-        title: "Pérdida de Refrigerante",
-        code: "P0008",
-        description: "Sistema de refrigeración pierde líquido continuamente",
-        symptoms:
-          "Temperatura motor alta, charcos debajo auto, olor a refrigerante dulce",
-        keywords: JSON.stringify([
-          "refrigerante",
-          "pérdida",
-          "temperatura",
-          "radiador",
-          "fugas",
-          "recalentamiento",
-        ]),
-        affectedSystems: JSON.stringify(["cooling", "engine"]),
-        vehicleTypes: JSON.stringify(["auto", "camión", "suv"]),
-        vehicleMakes: null,
-        commonCauses: JSON.stringify([
-          "Mangueras desgastadas o rotas",
-          "Radiador con grietas",
-          "Juntas defectuosas",
-          "Bomba de agua con fugas",
-          "Tapa de radiador fallida",
-        ]),
-        solutionProcess: JSON.stringify([
-          "1. Dejar motor enfríe completamente (20-30 min)",
-          "2. Inspeccionar todas mangueras radiador",
-          "3. Revisar radiador por grietas",
-          "4. Inspeccionar conexiones y juntas",
-          "5. Reemplazar componentes defectuosos",
-          "6. Purgar y llenar sistema con refrigerante",
-          "7. Purgar aire del sistema",
-        ]),
-        estimatedTime: 120,
-        estimatedCost: 350.0,
-        requiredParts: JSON.stringify([
-          "Mangueras radiador",
-          "Líquido refrigerante",
-          "Juntas",
-        ]),
-        tools: JSON.stringify([
-          "Llave inglesa",
-          "Destornilladores",
-          "Junta de goma",
-          "Purgador aire",
-        ]),
-        relatedFaults: null,
-        imagesUrls: null,
-        videoUrl: null,
-        relatedDocLink: null,
-        isCommon: true,
-        severity: "HIGH",
-        computerRequired: false,
-      },
-    }),
-    prisma.faultDatabase.create({
-      data: {
-        title: "Frenos Suave o Sin Respuesta",
-        code: "C0035",
-        description: "Pedal de freno está suave o no hay respuesta",
-        symptoms:
-          "Pedal muy suave, viaja hacia piso, requiere más presión frenar",
-        keywords: JSON.stringify([
-          "freno",
-          "suave",
-          "pedal",
-          "no frena",
-          "fallo",
-          "blando",
-        ]),
-        affectedSystems: JSON.stringify(["braking", "hydraulic"]),
-        vehicleTypes: JSON.stringify(["auto", "camión", "suv", "moto"]),
-        vehicleMakes: null,
-        commonCauses: JSON.stringify([
-          "Aire en líneas de freno",
-          "Pastillas desgastadas",
-          "Fuga cilindro maestro",
-          "Líquido freno bajo",
-          "Tuberías rotas",
-          "Pastillas mojadas",
-        ]),
-        solutionProcess: JSON.stringify([
-          "1. Verificar nivel líquido freno",
-          "2. Revisar si hay fugas",
-          "3. Purgar aire del sistema freno",
-          "4. Inspeccionar pastillas y discos",
-          "5. Revisar cilindro maestro",
-          "6. Reemplazar componentes defectuosos",
-          "7. Purgar sistema completo después reparación",
-        ]),
-        estimatedTime: 150,
-        estimatedCost: 350.0,
-        requiredParts: JSON.stringify([
-          "Pastillas freno",
-          "Líquido freno DOT 4",
-          "Discos freno",
-        ]),
-        tools: JSON.stringify([
-          "Purga frenos",
-          "Llaves",
-          "Hexagonales",
-          "Extractor pastillas",
-        ]),
-        relatedFaults: null,
-        imagesUrls: null,
-        videoUrl: null,
-        relatedDocLink: null,
-        isCommon: true,
-        severity: "CRITICAL",
-        computerRequired: false,
-      },
-    }),
-    prisma.faultDatabase.create({
-      data: {
-        title: "Ruido de Motor Fuerte - Golpeteo",
-        code: "P0325",
-        description: "Se escucha ruido de golpeteo o detonación",
-        symptoms:
-          "Ruido metálico fuerte especialmente bajo aceleración, pérdida potencia",
-        keywords: JSON.stringify([
-          "ruido",
-          "golpe",
-          "detonación",
-          "engine knock",
-          "motor",
-          "golpeteo",
-        ]),
-        affectedSystems: JSON.stringify(["engine", "sensor"]),
-        vehicleTypes: JSON.stringify(["auto", "suv", "camión"]),
-        vehicleMakes: null,
-        commonCauses: JSON.stringify([
-          "Combustible octanaje bajo",
-          "Sensor detonación defectuoso",
-          "Carbón acumulado cilindros",
-          "Válvulas desgastadas",
-          "Tiempo ignición incorrecto",
-          "Bujías desgastadas",
-        ]),
-        solutionProcess: JSON.stringify([
-          "1. Cambiar a combustible octanaje más alto",
-          "2. Usar aditivo limpiador combustible",
-          "3. Verificar sensor detonación con escáner",
-          "4. Revisar tiempo ignición",
-          "5. Limpiar cámara combustión",
-          "6. Cambiar bujías si gastadas",
-          "7. Reemplazar sensor si defectuoso",
-        ]),
-        estimatedTime: 180,
-        estimatedCost: 250.0,
-        requiredParts: JSON.stringify([
-          "Bujías",
-          "Aditivo limpiador",
-          "Sensor detonación",
-        ]),
-        tools: JSON.stringify([
-          "Escáner OBD2",
-          "Llaves bujías",
-          "Multímetro",
-          "Destornilladores",
-        ]),
-        relatedFaults: null,
-        imagesUrls: null,
-        videoUrl: null,
-        relatedDocLink: null,
-        isCommon: true,
-        severity: "HIGH",
-        computerRequired: true,
-      },
-    }),
-    prisma.faultDatabase.create({
-      data: {
-        title: "Aceite en Bajo Nivel",
-        code: null,
-        description: "Nivel de aceite por debajo del mínimo recomendado",
-        symptoms: "Luz aceite en tablero, bajo nivel varilla, ruido motor seco",
-        keywords: JSON.stringify([
-          "aceite",
-          "bajo",
-          "nivel",
-          "luz",
-          "varilla",
-          "cambio",
-        ]),
-        affectedSystems: JSON.stringify(["engine", "lubrication"]),
-        vehicleTypes: JSON.stringify(["auto", "camión", "suv", "moto"]),
-        vehicleMakes: null,
-        commonCauses: JSON.stringify([
-          "Mantenimiento atrasado",
-          "Fuga aceite",
-          "Consumo excesivo aceite",
-          "Juntas gastadas",
-          "Aro segmento defectuoso",
-        ]),
-        solutionProcess: JSON.stringify([
-          "1. Estacionar en superficie plana",
-          "2. Dejar motor reposar 5 minutos",
-          "3. Extraer y revisar varilla aceite",
-          "4. Agregar aceite especificado hasta máximo",
-          "5. Si sigue bajo, revisar fugas",
-          "6. Si consume mucho, revisar motivo",
-          "7. Cambiar aceite y filtro si atrasado",
-        ]),
-        estimatedTime: 30,
-        estimatedCost: 50.0,
-        requiredParts: JSON.stringify(["Aceite motor (según especificación)"]),
-        tools: JSON.stringify(["Varilla aceite", "Embudo", "Trapo limpio"]),
-        relatedFaults: null,
-        imagesUrls: null,
-        videoUrl: null,
-        relatedDocLink: null,
-        isCommon: true,
-        severity: "MEDIUM",
-        computerRequired: false,
-      },
-    }),
-    prisma.faultDatabase.create({
-      data: {
-        title: "Dirección Dura o Pesada",
-        code: "P0857",
-        description:
-          "Volante muy difícil de girar, dirección requiere mucho esfuerzo",
-        symptoms:
-          "Volante pesado, difícil de girar, especialmente estacionamiento",
-        keywords: JSON.stringify([
-          "dirección",
-          "pesada",
-          "dura",
-          "hidráulica",
-          "volante",
-          "esfuerzo",
-        ]),
-        affectedSystems: JSON.stringify(["steering", "hydraulic"]),
-        vehicleTypes: JSON.stringify(["auto", "camión", "suv"]),
-        vehicleMakes: null,
-        commonCauses: JSON.stringify([
-          "Líquido dirección bajo",
-          "Bomba dirección falha",
-          "Correa distribución desgastada",
-          "Tubería pinzada",
-          "Pastilla desgastada",
-        ]),
-        solutionProcess: JSON.stringify([
-          "1. Revisar nivel líquido dirección",
-          "2. Agregar si bajo",
-          "3. Revisar correa distribución",
-          "4. Inspeccionar bomba dirección",
-          "5. Revisar tuberías por daño",
-          "6. Probar con motor encendido",
-          "7. Cambiar líquido si sucio",
-        ]),
-        estimatedTime: 90,
-        estimatedCost: 200.0,
-        requiredParts: JSON.stringify([
-          "Líquido dirección",
-          "Posible bomba",
-          "Correa",
-        ]),
-        tools: JSON.stringify(["Llaves", "Extractor correa", "Bomba líquido"]),
-        relatedFaults: null,
-        imagesUrls: null,
-        videoUrl: null,
-        relatedDocLink: null,
-        isCommon: false,
-        severity: "MEDIUM",
-        computerRequired: false,
-      },
-    }),
-  ]);
+    });
 
-  console.log("✓ 7 fallas creadas en base de conocimiento");
+    // Cada cliente tiene 1 o 2 vehículos
+    const numVehicles = i % 5 === 0 ? 2 : 1;
+    for (let j = 0; j < numVehicles; j++) {
+      const make = carMakes[Math.floor(Math.random() * carMakes.length)];
+      const v = await prisma.vehicle.create({
+        data: {
+          clientId: client.id,
+          make: make,
+          model:
+            carModels[make][Math.floor(Math.random() * carModels[make].length)],
+          year: 2010 + Math.floor(Math.random() * 14),
+          licensePlate: `${Math.floor(1000 + Math.random() * 8999)}-${String.fromCharCode(65 + (i % 26))}BC`,
+          type: "Particular",
+          engineType: "WITH_COMPUTER",
+        },
+      });
+      createdVehicles.push(v);
+    }
+  }
 
-  // ============================================
-  // CREAR COTIZACIONES
-  // ============================================
-  const quotations = await Promise.all([
-    prisma.quotation.create({
-      data: {
-        quotationNumber: "COT-2024-001",
-        clientId: clients[0].id,
-        vehicleId: vehicles[0].id,
-        status: "PENDING",
-        estimatedTotal: 450.0,
-        diagnosisDate: new Date("2024-03-15"),
-        diagnosisMechanicNotes:
-          "Revisión completa solicitada. Revisar frenos y aceite",
-        externalDiagnosisCode: null,
-        quotationDate: new Date("2024-03-15"),
-      },
-    }),
-    prisma.quotation.create({
-      data: {
-        quotationNumber: "COT-2024-002",
-        clientId: clients[1].id,
-        vehicleId: vehicles[2].id,
-        status: "ACCEPTED",
-        estimatedTotal: 280.0,
-        diagnosisDate: new Date("2024-03-16"),
-        diagnosisMechanicNotes: "Cambio de aceite y filtro",
-        externalDiagnosisCode: null,
-        quotationDate: new Date("2024-03-16"),
-      },
-    }),
-    prisma.quotation.create({
-      data: {
-        quotationNumber: "COT-2024-003",
-        clientId: clients[2].id,
-        vehicleId: vehicles[3].id,
-        status: "IN_DIAGNOSIS",
-        estimatedTotal: 750.0,
-        diagnosisDate: new Date("2024-03-18"),
-        diagnosisMechanicNotes: "Revisar dirección y batería",
-        externalDiagnosisCode: "P0001",
-        quotationDate: new Date("2024-03-18"),
-      },
-    }),
-  ]);
+  // 5. HISTORIAL DE VENTAS (40 Órdenes completadas con horas y precios)
+  console.log("⏳ Generando histórico de 6 meses...");
+  for (let i = 0; i < 40; i++) {
+    const vehicle =
+      createdVehicles[Math.floor(Math.random() * createdVehicles.length)];
+    const date = new Date();
+    date.setMonth(date.getMonth() - Math.floor(Math.random() * 6)); // Últimos 6 meses
 
-  console.log("✓ 3 cotizaciones creadas");
+    const total = 500 + Math.floor(Math.random() * 2500);
 
-  // ============================================
-  // CREAR ÓRDENES DE TRABAJO
-  // ============================================
-  const workOrders = await Promise.all([
-    prisma.workOrder.create({
+    const quote = await prisma.quotation.create({
       data: {
-        workOrderNumber: "WO-2024-001",
-        quotationId: quotations[1].id,
-        clientId: clients[1].id,
-        vehicleId: vehicles[2].id,
-        status: "COMPLETED",
-        startDate: new Date("2024-03-16 09:00"),
-        completionDate: new Date("2024-03-16 11:30"),
-        estimatedHours: 2.0,
-        actualHours: 2.5,
-        mechanic: "Carlos Ruiz",
-        notes: "Cambio aceite 5W40 y filtro. Vehículo en perfect estado",
-        totalCost: 280.0,
+        quotationNumber: `COT-FIN-${i}`,
+        clientId: vehicle.clientId,
+        vehicleId: vehicle.id,
+        status: "converted_to_order",
+        estimatedTotal: total,
+        createdAt: date,
       },
-    }),
-    prisma.workOrder.create({
+    });
+
+    const order = await prisma.workOrder.create({
       data: {
-        workOrderNumber: "WO-2024-002",
-        quotationId: quotations[0].id,
-        clientId: clients[0].id,
-        vehicleId: vehicles[0].id,
-        status: "IN_PROGRESS",
-        startDate: new Date("2024-03-19 08:00"),
-        completionDate: null,
+        workOrderNumber: `OT-FIN-${i}`,
+        quotationId: quote.id,
+        clientId: vehicle.clientId,
+        vehicleId: vehicle.id,
+        status: "completed", // EN MINÚSCULAS PARA CONSISTENCIA
+        startDate: date,
+        completionDate: date,
         estimatedHours: 4.0,
-        actualHours: 2.0,
-        mechanic: "Miguel Sánchez",
-        notes:
-          "Revisión completa en proceso. Frenos OK. Esperando aprobación para cambio batería",
-        totalCost: 450.0,
+        actualHours: 3.5 + Math.random() * 2, // PARA QUE SE CONTABILICE EL RENDIMIENTO
+        mechanic: "Maestro Lucho",
+        notes: "Servicio completado exitosamente",
+        totalCost: total,
+        createdAt: date,
       },
-    }),
-  ]);
+    });
 
-  console.log("✓ 2 órdenes de trabajo creadas");
-
-  // ============================================
-  // CREAR DIAGNÓSTICOS
-  // ============================================
-  await Promise.all([
-    prisma.diagnostic.create({
+    // Añadir ítems a la orden (Para que "Productos más vendidos" funcione)
+    const product =
+      productsData[Math.floor(Math.random() * productsData.length)];
+    await prisma.orderItem.create({
       data: {
-        quotationId: quotations[0].id,
-        vehicleId: vehicles[0].id,
-        faultType: "MANUAL_INSPECTION",
-        faultCodes: null,
-        symptoms: "Ruido en frenos, batería débil",
-        affectedSystems: JSON.stringify(["braking", "electrical"]),
-        severity: "MEDIUM",
-        detailedAnalysis:
-          "Inspección manual realizada. Pastillas freno con 30% desgaste. Batería con 3.5 años",
-        recommendedFix:
-          "Cambiar pastillas freno y reemplazar batería por precaución",
-        relatedFaults: JSON.stringify([faults[0].id, faults[3].id]),
-        imagesUrls: null,
-      },
-    }),
-    prisma.diagnostic.create({
-      data: {
-        quotationId: quotations[1].id,
-        vehicleId: vehicles[2].id,
-        faultType: "MANUAL_INSPECTION",
-        faultCodes: null,
-        symptoms: "Mantenimiento preventivo",
-        affectedSystems: JSON.stringify(["engine", "lubrication"]),
-        severity: "LOW",
-        detailedAnalysis: "Inspección visual completada. Todo OK",
-        recommendedFix:
-          "Ejecutar cambio aceite y filtro. Revisar nuevamente en 6 meses",
-        relatedFaults: null,
-        imagesUrls: null,
-      },
-    }),
-  ]);
-
-  console.log("✓ 2 diagnósticos creados");
-
-  // ============================================
-  // CREAR ITEMS DE ORDEN DE TRABAJO
-  // ============================================
-  await Promise.all([
-    prisma.orderItem.create({
-      data: {
-        workOrderId: workOrders[0].id,
-        productId: products[3].id, // OIL-005W40
+        workOrderId: order.id,
+        productId: product.id,
         quantity: 1,
-        unitPrice: 45.0,
-        subtotal: 45.0,
+        unitPrice: total * 0.6,
+        subtotal: total * 0.6,
       },
-    }),
-    prisma.orderItem.create({
-      data: {
-        workOrderId: workOrders[0].id,
-        productId: products[8].id, // OIL-FILTER
-        quantity: 1,
-        unitPrice: 20.0,
-        subtotal: 20.0,
-      },
-    }),
-    prisma.orderItem.create({
-      data: {
-        workOrderId: workOrders[1].id,
-        productId: products[0].id, // BATT-001
-        quantity: 1,
-        unitPrice: 120.0,
-        subtotal: 120.0,
-      },
-    }),
-    prisma.orderItem.create({
-      data: {
-        workOrderId: workOrders[1].id,
-        productId: products[9].id, // BRAKE-PAD
-        quantity: 1,
-        unitPrice: 85.0,
-        subtotal: 85.0,
-      },
-    }),
-  ]);
+    });
 
-  console.log("✓ 4 items de orden de trabajo creados");
-
-  // ============================================
-  // CREAR VENTAS
-  // ============================================
-  const sales = await Promise.all([
-    prisma.sale.create({
+    await prisma.sale.create({
       data: {
-        saleNumber: "V-2024-001",
-        workOrderId: workOrders[0].id,
-        clientId: clients[1].id,
-        paymentMethod: "tarjeta_crédito",
+        saleNumber: `FAC-${2000 + i}`,
+        workOrderId: order.id,
+        clientId: vehicle.clientId,
+        subtotal: total,
+        total: total,
+        paymentMethod: i % 2 === 0 ? "CASH" : "CARD",
         paymentStatus: "paid",
-        invoiceNumber: "INV-2024-001",
-        saleDate: new Date("2024-03-16 12:00"),
-        subtotal: 65.0,
-        tax: 13.65,
-        discount: 0,
-        total: 78.65,
-        notes: "Pago recibido correctamente",
+        saleDate: date,
+        createdAt: date,
       },
-    }),
-  ]);
+    });
+  }
 
-  console.log("✓ 1 venta creada");
-
-  // ============================================
-  // CREAR ITEMS DE COTIZACIÓN
-  // ============================================
-  await Promise.all([
-    prisma.quotationItem.create({
-      data: {
-        quotationId: quotations[0].id,
-        productId: products[0].id, // BATT-001
-        quantity: 1,
-        unitPrice: 120.0,
-        subtotal: 120.0,
-      },
-    }),
-    prisma.quotationItem.create({
-      data: {
-        quotationId: quotations[0].id,
-        productId: products[9].id, // BRAKE-PAD
-        quantity: 1,
-        unitPrice: 85.0,
-        subtotal: 85.0,
-      },
-    }),
-    prisma.quotationItem.create({
-      data: {
-        quotationId: quotations[1].id,
-        productId: products[3].id, // OIL-005W40
-        quantity: 1,
-        unitPrice: 45.0,
-        subtotal: 45.0,
-      },
-    }),
-    prisma.quotationItem.create({
-      data: {
-        quotationId: quotations[1].id,
-        productId: products[8].id, // OIL-FILTER
-        quantity: 1,
-        unitPrice: 20.0,
-        subtotal: 20.0,
-      },
-    }),
-    prisma.quotationItem.create({
-      data: {
-        quotationId: quotations[2].id,
-        productId: products[0].id, // BATT-001
-        quantity: 1,
-        unitPrice: 120.0,
-        subtotal: 120.0,
-      },
-    }),
-  ]);
-
-  console.log("✓ 5 items de cotización creados");
-
-  console.log("✅ ¡Base de datos poblada exitosamente!");
-  console.log(`
-📊 Resumen de datos creados:
-   - 8 Clientes
-   - 11 Vehículos
-   - 21 Productos
-   - 7 Fallas en BD
-   - 3 Cotizaciones (1 Pendiente, 1 Aceptada, 1 En Diagnóstico)
-   - 2 Órdenes de Trabajo (1 Completada, 1 En Progreso)
-   - 2 Diagnósticos
-   - 1 Venta completada
-  `);
+  console.log(
+    "✅ Seed completado. 40 ventas, 45 vehículos y 60 productos listos.",
+  );
 }
 
-main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error("❌ Error al sembrar datos:", e);
-    await prisma.$disconnect();
-    process.exit(1);
-  });
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

@@ -16,3 +16,6 @@ Puedes acceder al sistema utilizando las siguientes credenciales:
 - **Dashboard:** Resumen del estado actual del taller.
 - **Fallas:** Buscador inteligente de jurisprudencia técnica.
 - **Ventas y Reportes:** Visualización de ingresos y estadísticas (¡Ya están funcionando!).
+
+nelson@gmail.com
+abc123

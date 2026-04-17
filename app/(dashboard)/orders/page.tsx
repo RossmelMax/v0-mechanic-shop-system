@@ -1,95 +1,124 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react'
-import { useWorkOrders } from '@/hooks/use-orders'
-import { WorkOrderWithRelations } from '@/lib/types'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Plus, Eye, Edit, Trash2, User, Car, Calendar } from 'lucide-react'
-import { WorkOrderFormDialog } from '@/components/orders/work-order-form-dialog'
-import { WorkOrderDetailsDialog } from '@/components/orders/work-order-details-dialog'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
-import { toast } from '@/hooks/use-toast'
+import React, { useState } from "react";
+import { useWorkOrders } from "@/hooks/use-orders";
+import { WorkOrderWithRelations } from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Plus, Eye, Edit, Trash2, User, Car, Calendar } from "lucide-react";
+import { WorkOrderFormDialog } from "@/components/orders/work-order-form-dialog";
+import { WorkOrderDetailsDialog } from "@/components/orders/work-order-details-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "@/hooks/use-toast";
 
 const statusColors = {
-  pending: 'bg-yellow-100 text-yellow-800',
-  in_progress: 'bg-blue-100 text-blue-800',
-  completed: 'bg-green-100 text-green-800',
-  cancelled: 'bg-red-100 text-red-800',
-}
+  pending: "bg-yellow-100 text-yellow-800",
+  in_progress: "bg-blue-100 text-blue-800",
+  completed: "bg-green-100 text-green-800",
+  cancelled: "bg-red-100 text-red-800",
+};
 
 const statusLabels = {
-  pending: 'Pendiente',
-  in_progress: 'En Progreso',
-  completed: 'Completada',
-  cancelled: 'Cancelada',
-}
+  pending: "Pendiente",
+  in_progress: "En Progreso",
+  completed: "COMPLETED",
+  cancelled: "Cancelada",
+};
 
 export default function OrdersPage() {
-  const { workOrders, isLoading, mutate } = useWorkOrders()
-  const [formDialogOpen, setFormDialogOpen] = useState(false)
-  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false)
-  const [selectedOrder, setSelectedOrder] = useState<WorkOrderWithRelations | null>(null)
-  const [editingOrder, setEditingOrder] = useState<WorkOrderWithRelations | null>(null)
+  const { workOrders, isLoading, mutate } = useWorkOrders();
+  const [formDialogOpen, setFormDialogOpen] = useState(false);
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] =
+    useState<WorkOrderWithRelations | null>(null);
+  const [editingOrder, setEditingOrder] =
+    useState<WorkOrderWithRelations | null>(null);
 
   const handleCreateOrder = () => {
-    setEditingOrder(null)
-    setFormDialogOpen(true)
-  }
+    setEditingOrder(null);
+    setFormDialogOpen(true);
+  };
 
   const handleEditOrder = (order: WorkOrderWithRelations) => {
-    setEditingOrder(order)
-    setFormDialogOpen(true)
-  }
+    setEditingOrder(order);
+    setFormDialogOpen(true);
+  };
 
   const handleViewOrder = (order: WorkOrderWithRelations) => {
-    setSelectedOrder(order)
-    setDetailsDialogOpen(true)
-  }
+    setSelectedOrder(order);
+    setDetailsDialogOpen(true);
+  };
 
   const handleDeleteOrder = async (orderId: string) => {
     try {
       const response = await fetch(`/api/orders/${orderId}`, {
-        method: 'DELETE',
-      })
+        method: "DELETE",
+      });
 
       if (!response.ok) {
-        throw new Error('Error al eliminar la orden')
+        throw new Error("Error al eliminar la orden");
       }
 
       toast({
-        title: 'Orden eliminada',
-        description: 'La orden de trabajo ha sido eliminada exitosamente.',
-      })
+        title: "Orden eliminada",
+        description: "La orden de trabajo ha sido eliminada exitosamente.",
+      });
 
-      mutate()
+      mutate();
     } catch (_error) {
       toast({
-        title: 'Error',
-        description: 'No se pudo eliminar la orden de trabajo.',
-        variant: 'destructive',
-      })
+        title: "Error",
+        description: "No se pudo eliminar la orden de trabajo.",
+        variant: "destructive",
+      });
     }
-  }
+  };
 
   if (isLoading) {
     return (
       <div className="space-y-8">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Órdenes de Trabajo</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Órdenes de Trabajo
+          </h1>
           <p className="text-gray-600">Cargando órdenes de trabajo...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Órdenes de Trabajo</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Órdenes de Trabajo
+          </h1>
           <p className="text-gray-600">
             Gestiona las órdenes de trabajo de los vehículos
           </p>
@@ -117,7 +146,11 @@ export default function OrdersPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {(workOrders || []).filter((order: any) => order.status === 'pending').length}
+              {
+                (workOrders || []).filter(
+                  (order: any) => order.status === "pending",
+                ).length
+              }
             </div>
           </CardContent>
         </Card>
@@ -128,7 +161,11 @@ export default function OrdersPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {(workOrders || []).filter((order: any) => order.status === 'in_progress').length}
+              {
+                (workOrders || []).filter(
+                  (order: any) => order.status === "in_progress",
+                ).length
+              }
             </div>
           </CardContent>
         </Card>
@@ -139,7 +176,11 @@ export default function OrdersPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {(workOrders || []).filter((order: any) => order.status === 'completed').length}
+              {
+                (workOrders || []).filter(
+                  (order: any) => order.status === "completed",
+                ).length
+              }
             </div>
           </CardContent>
         </Card>
@@ -169,32 +210,51 @@ export default function OrdersPage() {
             <TableBody>
               {(workOrders || []).map((order: any) => (
                 <TableRow key={order.id}>
-                  <TableCell className="font-medium">{order.workOrderNumber || '-'}</TableCell>
+                  <TableCell className="font-medium">
+                    {order.workOrderNumber || "-"}
+                  </TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2">
                       <User className="h-4 w-4 text-gray-400" />
-                      <span>{order.client?.name || '-'}</span>
+                      <span>{order.client?.name || "-"}</span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2">
                       <Car className="h-4 w-4 text-gray-400" />
-                      <span>{order.vehicle?.make || ''} {order.vehicle?.model || ''} ({order.vehicle?.year || ''})</span>
+                      <span>
+                        {order.vehicle?.make || ""} {order.vehicle?.model || ""}{" "}
+                        ({order.vehicle?.year || ""})
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge className={statusColors[order.status as keyof typeof statusColors] || statusColors.pending}>
-                      {statusLabels[order.status as keyof typeof statusLabels] || order.status}
+                    <Badge
+                      className={
+                        statusColors[
+                          order.status as keyof typeof statusColors
+                        ] || statusColors.pending
+                      }
+                    >
+                      {statusLabels[
+                        order.status as keyof typeof statusLabels
+                      ] || order.status}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : '-'}
+                    {order.createdAt
+                      ? new Date(order.createdAt).toLocaleDateString()
+                      : "-"}
                   </TableCell>
                   <TableCell>
-                    {order.startDate ? new Date(order.startDate).toLocaleDateString() : '-'}
+                    {order.startDate
+                      ? new Date(order.startDate).toLocaleDateString()
+                      : "-"}
                   </TableCell>
                   <TableCell>
-                    {order.completionDate ? new Date(order.completionDate).toLocaleDateString() : '-'}
+                    {order.completionDate
+                      ? new Date(order.completionDate).toLocaleDateString()
+                      : "-"}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-2">
@@ -214,16 +274,22 @@ export default function OrdersPage() {
                       </Button>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="ghost" size="sm">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                          >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>¿Eliminar orden de trabajo?</AlertDialogTitle>
+                            <AlertDialogTitle>
+                              ¿Eliminar orden de trabajo?
+                            </AlertDialogTitle>
                             <AlertDialogDescription>
-                              Esta acción no se puede deshacer. Se eliminará permanentemente
-                              la orden de trabajo {order.workOrderNumber}.
+                              Esta acción no se puede deshacer. Se eliminará
+                              permanentemente la orden de trabajo{" "}
+                              {order.workOrderNumber}.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
@@ -251,8 +317,8 @@ export default function OrdersPage() {
         onOpenChange={setFormDialogOpen}
         workOrder={editingOrder || undefined}
         onSuccess={() => {
-          mutate()
-          setFormDialogOpen(false)
+          mutate();
+          setFormDialogOpen(false);
         }}
       />
 
@@ -262,5 +328,5 @@ export default function OrdersPage() {
         workOrder={selectedOrder}
       />
     </div>
-  )
+  );
 }
