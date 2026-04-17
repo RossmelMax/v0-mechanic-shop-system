@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { serializeBigInt } from "@/lib/utils";
 
 const prisma = new PrismaClient();
 
@@ -113,7 +114,7 @@ export async function GET() {
       LIMIT 10
     `;
 
-    return NextResponse.json({
+    return NextResponse.json(serializeBigInt({
       summary: {
         totalProducts,
         totalInventoryValue: inventoryValue._sum.quantity || 0,
@@ -129,7 +130,7 @@ export async function GET() {
       topSellingProducts,
       productsWithMostMovements,
       recentMovements: productMovements,
-    });
+    }));
   } catch (error) {
     console.error("Error fetching products report:", error);
     return NextResponse.json(

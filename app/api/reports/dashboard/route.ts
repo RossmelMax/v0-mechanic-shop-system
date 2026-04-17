@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { serializeBigInt } from "@/lib/utils";
 
 const prisma = new PrismaClient();
 
@@ -26,13 +27,13 @@ export async function GET() {
         _sum: { total: true },
       }),
       prisma.quotation.count({
-        where: { status: "pending" },
+        where: { status: "PENDING" },
       }),
       prisma.workOrder.count({
-        where: { status: { in: ["pending", "in_progress"] } },
+        where: { status: { in: ["PENDING", "IN_PROGRESS"] } },
       }),
       prisma.sale.count({
-        where: { paymentStatus: { in: ["pending", "partial", "overdue"] } },
+        where: { paymentStatus: { in: ["PENDING", "PARTIAL", "OVERDUE"] } },
       }),
     ]);
 
@@ -113,13 +114,16 @@ export async function GET() {
 
     const statusMap = {
       pending: 0,
-      in_progress: 0,
+      inProgress: 0,
       completed: 0,
       cancelled: 0,
     };
 
     workOrderStatus.forEach((item) => {
-      statusMap[item.status as keyof typeof statusMap] = item._count.status;
+      if (item.status === "PENDING") statusMap.pending = item._count.status;
+      if (item.status === "IN_PROGRESS") statusMap.inProgress = item._count.status;
+      if (item.status === "COMPLETED") statusMap.completed = item._count.status;
+      if (item.status === "CANCELLED") statusMap.cancelled = item._count.status;
     });
 
     // Ventas por método de pago
@@ -135,7 +139,7 @@ export async function GET() {
       total: item._sum.total || 0,
     }));
 
-    return NextResponse.json({
+    return NextResponse.json(serializeBigInt({
       totalClients,
       totalVehicles,
       totalQuotations,
@@ -150,7 +154,7 @@ export async function GET() {
       topClients,
       workOrderStatus: statusMap,
       salesByPaymentMethod: paymentMethods,
-    });
+    }));
   } catch (error) {
     console.error("Error fetching dashboard report:", error);
     return NextResponse.json(

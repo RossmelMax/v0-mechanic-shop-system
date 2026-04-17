@@ -16,6 +16,7 @@ async function main() {
   await prisma.faultDatabase.deleteMany({});
   await prisma.product.deleteMany({});
   await prisma.client.deleteMany({});
+  await prisma.user.deleteMany({});
 
   console.log("✓ Base de datos limpiada");
 
@@ -26,7 +27,7 @@ async function main() {
     data: {
       name: "Administrador",
       email: "admin@taller.com",
-      password: "$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi", // "password123"
+      password: "$2b$10$zP7jmwzLmj2l/eFk80oZVu7mNtSq/vB35Gr1XE/LaU8bV6LI6.pY6", // "password123"
       role: "ADMIN",
     },
   });

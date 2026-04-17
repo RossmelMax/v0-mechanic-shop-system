@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { serializeBigInt } from "@/lib/utils";
 
 const prisma = new PrismaClient();
 
@@ -143,7 +144,7 @@ export async function GET() {
       take: 50,
     });
 
-    return NextResponse.json({
+    return NextResponse.json(serializeBigInt({
       summary: {
         totalClients,
         activeClients,
@@ -155,7 +156,7 @@ export async function GET() {
       topClientsByWorkOrders,
       clientRetention,
       inactiveClients,
-    });
+    }));
   } catch (error) {
     console.error("Error fetching clients report:", error);
     return NextResponse.json(

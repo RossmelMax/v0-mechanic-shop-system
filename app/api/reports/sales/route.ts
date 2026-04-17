@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
+import { serializeBigInt } from "@/lib/utils";
 
 const prisma = new PrismaClient();
 
@@ -93,7 +94,7 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({
+    return NextResponse.json(serializeBigInt({
       summary: {
         totalSales,
         totalRevenue: totalRevenue._sum.total || 0,
@@ -114,7 +115,7 @@ export async function GET(request: NextRequest) {
       })),
       dailySales,
       sales,
-    });
+    }));
   } catch (error) {
     console.error("Error fetching sales report:", error);
     return NextResponse.json(

@@ -79,7 +79,8 @@ export default function SalesPage() {
 
   // Filtrar ventas
   const filteredSales = sales.filter(sale => {
-    const matchesSearch = sale.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const saleNumber = sale.saleNumber || sale.number || ""
+    const matchesSearch = saleNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       sale.client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       sale.workOrder.vehicle.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
       sale.workOrder.vehicle.model.toLowerCase().includes(searchTerm.toLowerCase())
@@ -211,7 +212,7 @@ export default function SalesPage() {
             <TableBody>
               {filteredSales.map((sale) => (
                 <TableRow key={sale.id}>
-                  <TableCell className="font-medium">{sale.number}</TableCell>
+                  <TableCell className="font-medium">{sale.saleNumber || sale.number}</TableCell>
                   <TableCell>{sale.client.name}</TableCell>
                   <TableCell>
                     {sale.workOrder.vehicle.make} {sale.workOrder.vehicle.model} ({sale.workOrder.vehicle.year})
