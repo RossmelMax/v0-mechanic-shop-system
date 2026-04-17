@@ -56,6 +56,16 @@ export function ClientsTable() {
 
   return (
     <div className="space-y-4">
+      <div className="flex justify-end">
+        <ClientFormDialog
+          open={showForm}
+          onOpenChange={setShowForm}
+          onSuccess={() => {
+            mutate()
+            setShowForm(false)
+          }}
+        />
+      </div>
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
@@ -133,15 +143,6 @@ export function ClientsTable() {
           </TableBody>
         </Table>
       </div>
-
-      <ClientFormDialog
-        open={showForm}
-        onOpenChange={setShowForm}
-        onSuccess={() => {
-          mutate()
-          setShowForm(false)
-        }}
-      />
     </div>
   )
 }
