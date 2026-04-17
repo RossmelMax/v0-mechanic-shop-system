@@ -32,24 +32,24 @@ export default function DashboardPage() {
 
     // Calculate stats from real data
     const stats = {
-        totalClients: clients.length,
-        totalVehicles: clients.reduce((sum, client) => sum + (client.vehicles?.length || 0), 0),
-        totalOrders: workOrders.length,
-        totalSales: sales.length,
-        pendingOrders: workOrders.filter(o => o.status === 'pending').length,
-        completedOrders: workOrders.filter(o => o.status === 'completed').length,
-        totalRevenue: sales.reduce((sum, sale) => sum + sale.total, 0),
-        lowStockItems: products.filter(p => p.quantity <= p.minStock).length
+        totalClients: clients?.length || 0,
+        totalVehicles: clients?.reduce((sum, client) => sum + (client.vehicles?.length || 0), 0) || 0,
+        totalOrders: workOrders?.length || 0,
+        totalSales: sales?.length || 0,
+        pendingOrders: workOrders?.filter((o: any) => o.status === 'pending')?.length || 0,
+        completedOrders: workOrders?.filter((o: any) => o.status === 'completed')?.length || 0,
+        totalRevenue: sales?.reduce((sum: number, sale: any) => sum + (sale.total || 0), 0) || 0,
+        lowStockItems: products?.filter((p: any) => p.quantity <= p.minStock)?.length || 0
     }
 
-    const recentOrders = workOrders.slice(0, 2).map(order => ({
+    const recentOrders = workOrders?.slice(0, 2).map((order: any) => ({
         id: order.id,
-        number: order.workOrderNumber,
-        client: order.client.name,
-        vehicle: `${order.vehicle.make} ${order.vehicle.model}`,
-        status: order.status,
+        number: order.workOrderNumber || `ORD-${order.id}`,
+        client: order.client?.name || 'Cliente desconocido',
+        vehicle: `${order.vehicle?.make || ''} ${order.vehicle?.model || ''}`.trim() || 'Vehículo desconocido',
+        status: order.status || 'pending',
         total: 0
-    }))
+    })) || []
 
     const getStatusColor = (status: string) => {
         switch (status) {

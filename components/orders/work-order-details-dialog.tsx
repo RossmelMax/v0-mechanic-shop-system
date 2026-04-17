@@ -46,9 +46,9 @@ export function WorkOrderDetailsDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-200 max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>Orden de Trabajo #{workOrder.workOrderNumber}</DialogTitle>
+                    <DialogTitle>Orden de Trabajo #{workOrder.workOrderNumber || 'N/A'}</DialogTitle>
                     <DialogDescription>
                         Detalles completos de la orden de trabajo
                     </DialogDescription>
@@ -116,6 +116,7 @@ export function WorkOrderDetailsDialog({
                     </Card>
 
                     {/* Información del cliente */}
+                    {workOrder.client && (
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center space-x-2">
@@ -127,27 +128,29 @@ export function WorkOrderDetailsDialog({
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <p className="text-sm font-medium">Nombre</p>
-                                    <p className="text-sm text-gray-600">{workOrder.client.name}</p>
+                                    <p className="text-sm text-gray-600">{workOrder.client?.name || '-'}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium">Email</p>
-                                    <p className="text-sm text-gray-600">{workOrder.client.email || 'No especificado'}</p>
+                                    <p className="text-sm text-gray-600">{workOrder.client?.email || 'No especificado'}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium">Teléfono</p>
-                                    <p className="text-sm text-gray-600">{workOrder.client.phone || 'No especificado'}</p>
+                                    <p className="text-sm text-gray-600">{workOrder.client?.phone || 'No especificado'}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium">Cliente desde</p>
                                     <p className="text-sm text-gray-600">
-                                        {new Date(workOrder.client.createdAt).toLocaleDateString()}
+                                        {workOrder.client?.createdAt ? new Date(workOrder.client.createdAt).toLocaleDateString() : '-'}
                                     </p>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
+                    )}
 
                     {/* Información del vehículo */}
+                    {workOrder.vehicle && (
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center space-x-2">
@@ -160,30 +163,32 @@ export function WorkOrderDetailsDialog({
                                 <div>
                                     <p className="text-sm font-medium">Marca y Modelo</p>
                                     <p className="text-sm text-gray-600">
-                                        {workOrder.vehicle.make} {workOrder.vehicle.model}
+                                        {workOrder.vehicle?.make || ''} {workOrder.vehicle?.model || ''}
                                     </p>
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium">Año</p>
-                                    <p className="text-sm text-gray-600">{workOrder.vehicle.year}</p>
+                                    <p className="text-sm text-gray-600">{workOrder.vehicle?.year || '-'}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium">Placa</p>
-                                    <p className="text-sm text-gray-600">{workOrder.vehicle.licensePlate}</p>
+                                    <p className="text-sm text-gray-600">{workOrder.vehicle?.licensePlate || '-'}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium">Color</p>
-                                    <p className="text-sm text-gray-600">{workOrder.vehicle.color || 'No especificado'}</p>
+                                    <p className="text-sm text-gray-600">{workOrder.vehicle?.color || 'No especificado'}</p>
                                 </div>
                                 <div className="col-span-2">
                                     <p className="text-sm font-medium">VIN</p>
-                                    <p className="text-sm text-gray-600">{workOrder.vehicle.vin || 'No especificado'}</p>
+                                    <p className="text-sm text-gray-600">{workOrder.vehicle?.vin || 'No especificado'}</p>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
+                    )}
 
                     {/* Información de la cotización */}
+                    {workOrder.quotation && (
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center space-x-2">
@@ -195,31 +200,32 @@ export function WorkOrderDetailsDialog({
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <p className="text-sm font-medium">Número de Cotización</p>
-                                    <p className="text-sm text-gray-600">#{workOrder.quotation.quotationNumber}</p>
+                                    <p className="text-sm text-gray-600">#{workOrder.quotation?.quotationNumber || '-'}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium">Estado de Cotización</p>
                                     <Badge variant="outline">
-                                        {workOrder.quotation.status === 'ACCEPTED' ? 'Aceptada' :
-                                            workOrder.quotation.status === 'PENDING' ? 'Pendiente' :
-                                                workOrder.quotation.status === 'REJECTED' ? 'Rechazada' : workOrder.quotation.status}
+                                        {workOrder.quotation?.status === 'ACCEPTED' ? 'Aceptada' :
+                                            workOrder.quotation?.status === 'PENDING' ? 'Pendiente' :
+                                                workOrder.quotation?.status === 'REJECTED' ? 'Rechazada' : workOrder.quotation?.status}
                                     </Badge>
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium">Fecha de Cotización</p>
                                     <p className="text-sm text-gray-600">
-                                        {new Date(workOrder.quotation.createdAt).toLocaleDateString()}
+                                        {workOrder.quotation?.createdAt ? new Date(workOrder.quotation.createdAt).toLocaleDateString() : '-'}
                                     </p>
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium">Total de Cotización</p>
                                     <p className="text-sm text-gray-600">
-                                        ${workOrder.quotation.estimatedTotal?.toLocaleString() || '0'}
+                                        ${workOrder.quotation?.estimatedTotal?.toLocaleString() || '0'}
                                     </p>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
+                    )}
 
                     {/* Items de la orden */}
                     {workOrder.orderItems && workOrder.orderItems.length > 0 && (

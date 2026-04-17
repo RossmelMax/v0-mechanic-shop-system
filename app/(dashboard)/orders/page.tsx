@@ -117,7 +117,7 @@ export default function OrdersPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {workOrders.filter(order => order.status === 'pending').length}
+              {(workOrders || []).filter((order: any) => order.status === 'pending').length}
             </div>
           </CardContent>
         </Card>
@@ -128,7 +128,7 @@ export default function OrdersPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {workOrders.filter(order => order.status === 'in_progress').length}
+              {(workOrders || []).filter((order: any) => order.status === 'in_progress').length}
             </div>
           </CardContent>
         </Card>
@@ -139,7 +139,7 @@ export default function OrdersPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {workOrders.filter(order => order.status === 'completed').length}
+              {(workOrders || []).filter((order: any) => order.status === 'completed').length}
             </div>
           </CardContent>
         </Card>
@@ -167,28 +167,28 @@ export default function OrdersPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {workOrders.map((order) => (
+              {(workOrders || []).map((order: any) => (
                 <TableRow key={order.id}>
-                  <TableCell className="font-medium">{order.workOrderNumber}</TableCell>
+                  <TableCell className="font-medium">{order.workOrderNumber || '-'}</TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2">
                       <User className="h-4 w-4 text-gray-400" />
-                      <span>{order.client.name}</span>
+                      <span>{order.client?.name || '-'}</span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2">
                       <Car className="h-4 w-4 text-gray-400" />
-                      <span>{order.vehicle.make} {order.vehicle.model} ({order.vehicle.year})</span>
+                      <span>{order.vehicle?.make || ''} {order.vehicle?.model || ''} ({order.vehicle?.year || ''})</span>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge className={statusColors[order.status as keyof typeof statusColors]}>
-                      {statusLabels[order.status as keyof typeof statusLabels]}
+                    <Badge className={statusColors[order.status as keyof typeof statusColors] || statusColors.pending}>
+                      {statusLabels[order.status as keyof typeof statusLabels] || order.status}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {new Date(order.createdAt).toLocaleDateString()}
+                    {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : '-'}
                   </TableCell>
                   <TableCell>
                     {order.startDate ? new Date(order.startDate).toLocaleDateString() : '-'}
