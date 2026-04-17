@@ -23,7 +23,7 @@ import { Plus } from 'lucide-react'
 import {
   FieldGroup,
   FieldLabel,
-} from '@/components/ui/fieldgroup'
+} from '@/components/ui/field'
 import { toast } from 'sonner'
 import { Spinner } from '@/components/ui/spinner'
 

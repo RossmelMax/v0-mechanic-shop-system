@@ -1,0 +1,295 @@
+'use client'
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+    Users,
+    Car,
+    Wrench,
+    Receipt,
+    DollarSign,
+    TrendingUp,
+    Clock,
+    CheckCircle,
+    AlertTriangle,
+    Plus
+} from 'lucide-react'
+import Link from 'next/link'
+
+export default function DashboardPage() {
+    // Mock data - in a real app, this would come from your API
+    const stats = {
+        totalClients: 8,
+        totalVehicles: 11,
+        totalOrders: 2,
+        totalSales: 1,
+        pendingOrders: 1,
+        completedOrders: 1,
+        totalRevenue: 1250.00,
+        lowStockItems: 3
+    }
+
+    const recentOrders = [
+        {
+            id: '1',
+            number: 'ORD-2024-001',
+            client: 'María González',
+            vehicle: 'Toyota Corolla',
+            status: 'completed',
+            total: 450.00
+        },
+        {
+            id: '2',
+            number: 'ORD-2024-002',
+            client: 'Carlos Rodríguez',
+            vehicle: 'Ford Ranger',
+            status: 'in_progress',
+            total: 800.00
+        }
+    ]
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'completed':
+                return 'bg-green-100 text-green-800'
+            case 'in_progress':
+                return 'bg-blue-100 text-blue-800'
+            case 'pending':
+                return 'bg-yellow-100 text-yellow-800'
+            default:
+                return 'bg-gray-100 text-gray-800'
+        }
+    }
+
+    const getStatusLabel = (status: string) => {
+        switch (status) {
+            case 'completed':
+                return 'Completada'
+            case 'in_progress':
+                return 'En Progreso'
+            case 'pending':
+                return 'Pendiente'
+            default:
+                return status
+        }
+    }
+
+    return (
+        <div className="space-y-8">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+                    <p className="text-gray-600">Bienvenido a tu sistema de gestión de taller</p>
+                </div>
+                <div className="flex space-x-4">
+                    <Link href="/quotations">
+                        <Button>
+                            <Plus className="mr-2 h-4 w-4" />
+                            Nueva Cotización
+                        </Button>
+                    </Link>
+                    <Link href="/orders">
+                        <Button variant="outline">
+                            <Plus className="mr-2 h-4 w-4" />
+                            Nueva Orden
+                        </Button>
+                    </Link>
+                </div>
+            </div>
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Total Clientes</CardTitle>
+                        <Users className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{stats.totalClients}</div>
+                        <p className="text-xs text-muted-foreground">
+                            <TrendingUp className="inline h-3 w-3 mr-1" />
+                            +2 este mes
+                        </p>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Vehículos Registrados</CardTitle>
+                        <Car className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{stats.totalVehicles}</div>
+                        <p className="text-xs text-muted-foreground">
+                            Activos en el sistema
+                        </p>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Órdenes de Trabajo</CardTitle>
+                        <Wrench className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{stats.totalOrders}</div>
+                        <p className="text-xs text-muted-foreground">
+                            {stats.pendingOrders} pendientes, {stats.completedOrders} completadas
+                        </p>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Ingresos Totales</CardTitle>
+                        <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">${stats.totalRevenue.toLocaleString()}</div>
+                        <p className="text-xs text-muted-foreground">
+                            <TrendingUp className="inline h-3 w-3 mr-1" />
+                            +12% vs mes anterior
+                        </p>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Recent Orders and Alerts */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Recent Orders */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Órdenes Recientes</CardTitle>
+                        <CardDescription>
+                            Últimas órdenes de trabajo procesadas
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-4">
+                            {recentOrders.map((order) => (
+                                <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg">
+                                    <div className="flex-1">
+                                        <div className="flex items-center space-x-2">
+                                            <p className="font-medium">{order.number}</p>
+                                            <Badge className={getStatusColor(order.status)}>
+                                                {getStatusLabel(order.status)}
+                                            </Badge>
+                                        </div>
+                                        <p className="text-sm text-gray-600">{order.client} - {order.vehicle}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="font-semibold">${order.total.toLocaleString()}</p>
+                                        <Link href={`/orders/${order.id}`}>
+                                            <Button variant="ghost" size="sm">
+                                                Ver detalles
+                                            </Button>
+                                        </Link>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="mt-4">
+                            <Link href="/orders">
+                                <Button variant="outline" className="w-full">
+                                    Ver todas las órdenes
+                                </Button>
+                            </Link>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Alerts and Quick Actions */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Alertas y Acciones Rápidas</CardTitle>
+                        <CardDescription>
+                            Elementos que requieren tu atención
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-4">
+                            {stats.lowStockItems > 0 && (
+                                <div className="flex items-center p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                    <AlertTriangle className="h-5 w-5 text-yellow-600 mr-3" />
+                                    <div className="flex-1">
+                                        <p className="font-medium text-yellow-800">Productos con stock bajo</p>
+                                        <p className="text-sm text-yellow-700">{stats.lowStockItems} productos requieren reposición</p>
+                                    </div>
+                                    <Link href="/inventory">
+                                        <Button variant="outline" size="sm">
+                                            Gestionar
+                                        </Button>
+                                    </Link>
+                                </div>
+                            )}
+
+                            <div className="flex items-center p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                <Clock className="h-5 w-5 text-blue-600 mr-3" />
+                                <div className="flex-1">
+                                    <p className="font-medium text-blue-800">Órdenes pendientes</p>
+                                    <p className="text-sm text-blue-700">{stats.pendingOrders} órdenes requieren atención</p>
+                                </div>
+                                <Link href="/orders">
+                                    <Button variant="outline" size="sm">
+                                        Ver órdenes
+                                    </Button>
+                                </Link>
+                            </div>
+
+                            <div className="flex items-center p-4 bg-green-50 border border-green-200 rounded-lg">
+                                <CheckCircle className="h-5 w-5 text-green-600 mr-3" />
+                                <div className="flex-1">
+                                    <p className="font-medium text-green-800">Sistema operativo</p>
+                                    <p className="text-sm text-green-700">Todas las funcionalidades están activas</p>
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Quick Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-lg">Ventas del Mes</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-3xl font-bold text-green-600">${stats.totalRevenue.toLocaleString()}</div>
+                        <p className="text-sm text-gray-600 mt-2">
+                            {stats.totalSales} ventas realizadas
+                        </p>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-lg">Eficiencia del Taller</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-3xl font-bold text-blue-600">
+                            {stats.totalOrders > 0 ? Math.round((stats.completedOrders / stats.totalOrders) * 100) : 0}%
+                        </div>
+                        <p className="text-sm text-gray-600 mt-2">
+                            Tasa de completación de órdenes
+                        </p>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-lg">Clientes Activos</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-3xl font-bold text-purple-600">{stats.totalClients}</div>
+                        <p className="text-sm text-gray-600 mt-2">
+                            Clientes registrados en el sistema
+                        </p>
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
+    )
+}

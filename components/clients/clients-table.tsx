@@ -11,7 +11,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Spinner } from '@/components/ui/spinner'
-import { Empty } from '@/components/ui/empty'
+import { Empty, EmptyMedia, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
 import { Trash2, Edit2, Plus, Phone, Mail, MapPin } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -19,7 +19,6 @@ import { ClientFormDialog } from './client-form-dialog'
 
 export function ClientsTable() {
   const { clients, isLoading, mutate } = useClients()
-  const [selectedClient, setSelectedClient] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
 
   const handleDelete = async (id: string) => {
@@ -43,11 +42,15 @@ export function ClientsTable() {
 
   if (clients.length === 0) {
     return (
-      <Empty
-        icon={<Plus className="w-8 h-8" />}
-        title="Sin clientes"
-        description="Comienza agregando un nuevo cliente"
-      />
+      <Empty>
+        <EmptyMedia>
+          <Plus className="w-8 h-8" />
+        </EmptyMedia>
+        <EmptyHeader>
+          <EmptyTitle>Sin clientes</EmptyTitle>
+          <EmptyDescription>Comienza agregando un nuevo cliente</EmptyDescription>
+        </EmptyHeader>
+      </Empty>
     )
   }
 

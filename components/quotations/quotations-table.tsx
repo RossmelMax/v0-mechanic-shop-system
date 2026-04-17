@@ -11,9 +11,9 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Spinner } from '@/components/ui/spinner'
-import { Empty } from '@/components/ui/empty'
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
 import { Badge } from '@/components/ui/badge'
-import { FileText, Plus, Eye, Trash2 } from 'lucide-react'
+import { FileText, Eye, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { QuotationFormDialog } from './quotation-form-dialog'
@@ -53,11 +53,17 @@ export function QuotationsTable() {
 
   if (quotations.length === 0) {
     return (
-      <Empty
-        icon={<FileText className="w-8 h-8" />}
-        title="Sin cotizaciones"
-        description="Comienza creando una nueva cotización"
-      />
+      <Empty>
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <FileText className="w-8 h-8" />
+          </EmptyMedia>
+          <EmptyTitle>Sin cotizaciones</EmptyTitle>
+          <EmptyDescription>
+            Comienza creando una nueva cotización
+          </EmptyDescription>
+        </EmptyHeader>
+      </Empty>
     )
   }
 

@@ -11,10 +11,9 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Spinner } from '@/components/ui/spinner'
-import { Empty } from '@/components/ui/empty'
+import { Empty, EmptyMedia, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
 import { Trash2, Edit2, Plus, Gauge } from 'lucide-react'
-import { useState } from 'react'
-import { VehicleFormDialog } from './vehicle-form-dialog'
+import { VehicleFormDialog } from '@/components/vehicles/vehicle-form-dialog'
 
 interface VehiclesListProps {
   client: Client
@@ -23,7 +22,6 @@ interface VehiclesListProps {
 
 export function VehiclesList({ client, onVehicleAdded }: VehiclesListProps) {
   const { vehicles, isLoading, mutate } = useClientVehicles(client.id)
-  const [showForm, setShowForm] = useState(false)
 
   const handleDelete = async (id: string) => {
     if (confirm('¿Está seguro que desea eliminar este vehículo?')) {
@@ -47,11 +45,15 @@ export function VehiclesList({ client, onVehicleAdded }: VehiclesListProps) {
   if (vehicles.length === 0) {
     return (
       <div className="space-y-4">
-        <Empty
-          icon={<Plus className="w-8 h-8" />}
-          title="Sin vehículos"
-          description="Agrega el primer vehículo del cliente"
-        />
+        <Empty>
+          <EmptyMedia>
+            <Plus className="w-8 h-8" />
+          </EmptyMedia>
+          <EmptyHeader>
+            <EmptyTitle>Sin vehículos</EmptyTitle>
+            <EmptyDescription>Agrega el primer vehículo del cliente</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
         <VehicleFormDialog
           clientId={client.id}
           onSuccess={() => {

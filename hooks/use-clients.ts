@@ -30,6 +30,10 @@ export interface Vehicle {
   notes?: string
   createdAt: string
   updatedAt: string
+  client?: {
+    id: string
+    name: string
+  }
 }
 
 // Hook para obtener todos los clientes

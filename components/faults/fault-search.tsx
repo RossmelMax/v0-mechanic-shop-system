@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useFaultSearch } from '@/hooks/use-faults'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
 import { Search, AlertCircle, Clock, DollarSign, Gauge } from 'lucide-react'
-import { FieldGroup, FieldLabel } from '@/components/ui/fieldgroup'
+import { FieldGroup, FieldLabel } from '@/components/ui/field'
 
 const systemsOptions = [
   'engine',
@@ -86,12 +86,12 @@ export function FaultSearch() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <FieldGroup>
             <FieldLabel>Sistema Afectado</FieldLabel>
-            <Select value={selectedSystem} onValueChange={setSelectedSystem}>
+            <Select value={selectedSystem} onValueChange={(val) => setSelectedSystem(val === 'all' ? '' : val)}>
               <SelectTrigger>
                 <SelectValue placeholder="Todos los sistemas" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
                 {systemsOptions.map((system) => (
                   <SelectItem key={system} value={system}>
                     {system.charAt(0).toUpperCase() + system.slice(1)}
@@ -103,12 +103,12 @@ export function FaultSearch() {
 
           <FieldGroup>
             <FieldLabel>Severidad</FieldLabel>
-            <Select value={selectedSeverity} onValueChange={setSelectedSeverity}>
+            <Select value={selectedSeverity} onValueChange={(val) => setSelectedSeverity(val === 'all' ? '' : val)}>
               <SelectTrigger>
                 <SelectValue placeholder="Todas las severidades" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas</SelectItem>
+                <SelectItem value="all">Todas</SelectItem>
                 {severityOptions.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value}>
                     {opt.label}
@@ -120,15 +120,15 @@ export function FaultSearch() {
 
           <FieldGroup>
             <FieldLabel>Tipo de Diagnóstico</FieldLabel>
-            <Select value={computerRequired === undefined ? '' : computerRequired ? 'with' : 'without'} onValueChange={(val) => {
-              if (val === '') setComputerRequired(undefined)
+            <Select value={computerRequired === undefined ? 'all' : computerRequired ? 'with' : 'without'} onValueChange={(val) => {
+              if (val === 'all') setComputerRequired(undefined)
               else setComputerRequired(val === 'with')
             }}>
               <SelectTrigger>
                 <SelectValue placeholder="Todos" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
                 <SelectItem value="with">Requiere Computadora</SelectItem>
                 <SelectItem value="without">Sin Computadora</SelectItem>
               </SelectContent>
