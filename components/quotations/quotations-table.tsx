@@ -53,22 +53,48 @@ export function QuotationsTable() {
 
   if (quotations.length === 0) {
     return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <FileText className="w-8 h-8" />
-          </EmptyMedia>
-          <EmptyTitle>Sin cotizaciones</EmptyTitle>
-          <EmptyDescription>
-            Comienza creando una nueva cotización
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+      <div className="space-y-6">
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <FileText className="w-8 h-8" />
+            </EmptyMedia>
+            <EmptyTitle>Sin cotizaciones</EmptyTitle>
+            <EmptyDescription>
+              Comienza creando una nueva cotización
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+        <div className="flex justify-center">
+          <QuotationFormDialog
+            open={showForm}
+            onOpenChange={setShowForm}
+            onSuccess={() => {
+              mutate()
+              setShowForm(false)
+            }}
+          />
+        </div>
+      </div>
     )
   }
 
   return (
     <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold">Cotizaciones</h2>
+          <p className="text-gray-600">Total: {quotations.length} cotizaciones</p>
+        </div>
+        <QuotationFormDialog
+          open={showForm}
+          onOpenChange={setShowForm}
+          onSuccess={() => {
+            mutate()
+            setShowForm(false)
+          }}
+        />
+      </div>
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
@@ -130,15 +156,6 @@ export function QuotationsTable() {
           </TableBody>
         </Table>
       </div>
-
-      <QuotationFormDialog
-        open={showForm}
-        onOpenChange={setShowForm}
-        onSuccess={() => {
-          mutate()
-          setShowForm(false)
-        }}
-      />
     </div>
   )
 }
