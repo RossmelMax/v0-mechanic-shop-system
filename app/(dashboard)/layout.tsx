@@ -23,7 +23,9 @@ import {
     BarChart3,
     Settings,
     LogOut,
-    Home
+    Home,
+    Zap,
+    Package
 } from 'lucide-react'
 
 const navigation = [
@@ -32,6 +34,8 @@ const navigation = [
     { name: 'Vehículos', href: '/vehicles', icon: Car },
     { name: 'Cotizaciones', href: '/quotations', icon: FileText },
     { name: 'Órdenes', href: '/orders', icon: Wrench },
+    { name: 'Fallas', href: '/faults', icon: Zap },
+    { name: 'Productos', href: '/products', icon: Package },
     { name: 'Ventas', href: '/sales', icon: Receipt },
     { name: 'Reportes', href: '/reports', icon: BarChart3 },
 ]
